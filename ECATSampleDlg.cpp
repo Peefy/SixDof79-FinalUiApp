@@ -46,14 +46,11 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace std;
 
-//#define PID_CONTROL_ENABLE 1
-#define IS_HAS_SCENE 1
-
 #define TIMER_MS 10
 
-#define SCENE_THREAD_DELAY 8
-#define SENSOR_THREAD_DELAY 100
 #define SIXDOF_CONTROL_DELEY 50
+#define SCENE_THREAD_DELAY 1000
+#define SENSOR_THREAD_DELAY 1000
 #define DATA_BUFFER_THREAD_DELAY 1000
 
 #define DDA_UP_COUNT 400
@@ -65,7 +62,6 @@ using namespace std;
 
 bool enableShock = true;
 bool enableChirp = true;
-
 bool stopSCurve = false;
 
 void SixdofControl();
@@ -82,20 +78,17 @@ volatile HANDLE SceneThread;
 volatile HANDLE DataBufferThread;
 
 I32 pulse_test[AXES_COUNT];
+I32 lastStartPulse[AXES_COUNT];
 double pulse_cal[AXES_COUNT];
 
-//Translate com;
 SixDof sixdof;
 MotionControl delta;
 DataPackage data;
 DataPackage scenedata = {0};
-SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 LandVision vision;
 
-I32 lastStartPulse[AXES_COUNT];
+SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
-
-deque<double> dataBuffer[AXES_COUNT];
 
 Sensor sensor[SENSOR_COUNT] = 
 {
@@ -163,7 +156,6 @@ bool isTest = true;
 
 double testVal[FREEDOM_NUM];
 double testHz[FREEDOM_NUM];
-double controltime = 0;
 
 double chartBottomAxisPoint[CHART_POINT_NUM] = { 0 };
 
@@ -176,10 +168,10 @@ double chartYawValPoint[CHART_POINT_NUM] = { 0 };
 
 double runTime = 0;
 double chartTime = 0;
-
+double controltime = 0;
 double dataChartTime = 0;
 
-bool locked = false;
+double t = 0;
 
 DWORD WINAPI DataTransThread(LPVOID pParam)
 {
@@ -203,24 +195,15 @@ DWORD WINAPI SceneInfoThread(LPVOID pParam)
 {
 	while (true)
 	{
-		//scenedata = com.ProviedInfo();
 		Sleep(SCENE_THREAD_DELAY);
 	}
 	return 0;
 }
 
-bool isAutoSave = false;
-
-double t = 0;
-int bufferLength = 0;
-
 DWORD WINAPI DataBufferInfoThread(LPVOID pParam)
 {
 	while (true)
 	{
-		if (isAutoSave == true)
-		{
-		}
 		Sleep(DATA_BUFFER_THREAD_DELAY);
 	}
 	return 0;
