@@ -14,6 +14,14 @@
 #define VISION_PORT        2
 #define VISION_BAUDRATE    57600
 
+typedef enum 
+{
+	FlatLand = 0,
+	Cement = 1,
+	Sandy = 2,
+	Ice = 3
+}GroundType;
+
 #pragma pack (1)
 typedef struct 
 {
