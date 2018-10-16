@@ -355,7 +355,8 @@ void MotionControl::DownUsingHomeMode()
 	U16 status;
 	U16 TriggerSource = 0 , TriggerEdge = 1 ;
 	U16 Direction = 1 ;
-	I32 Offset = 10000, StrVel = 0 , FirstVel = DOWN_VEL, SecondVel = DOWN_VEL , EndVel = 0 ;
+	I32 downVel = (I32)(DOWN_VEL * 0.5);
+	I32 Offset = 10000, StrVel = 0 , FirstVel = downVel, SecondVel = downVel , EndVel = 0 ;
 	F64 Tacc = 0.5 , Tdec = 0.5;
 	U16 SCurve = 0 ;	
 	for(auto i = 0;i < AXES_NUM;++i)

@@ -968,6 +968,8 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 		MessageBox(_T(SIXDOF_NOT_BOTTOM_MESSAGE));
 		return;
 	}
+	delta.DownUsingHomeMode();
+	Sleep(100);
 	delta.ReadAllSwitchStatus();
 	if (delta.IsAllAtBottom() == false)
 	{
@@ -1023,7 +1025,6 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 	sin_time_pulse = 0;
 	t = 0;
 	dataChartTime = 0;
-	isAutoSave = true;
 	closeDataThread = false;
 	isStart = true;	
 }
@@ -1031,7 +1032,6 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 void CECATSampleDlg::OnBnClickedBtnStopme()
 {
 	stopSCurve = true;
-	isAutoSave = false;
 	Sleep(1000);
 	closeDataThread = true;
 	delta.ServoStop();
@@ -1161,7 +1161,6 @@ void CECATSampleDlg::OnBnClickedButtonTest()
 	isTest = true;
 	t = 0;
 	dataChartTime = 0;
-	isAutoSave = true;
 	closeDataThread = false;
 	isStart = true;
 }
@@ -1221,7 +1220,6 @@ void CECATSampleDlg::OnBnClickedButtonTest3()
 	isTest = true;
 	t = 0;
 	dataChartTime = 0;
-	isAutoSave = true;
 	closeDataThread = false;
 	isStart = true;
 }
