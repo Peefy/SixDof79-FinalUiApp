@@ -934,6 +934,7 @@ void CECATSampleDlg::OnChkSvon()
 void CECATSampleDlg::OnOK() 
 {
 	delta.ServoStop();
+	Sleep(100);
 	delta.Close();
 
 	CDialog::OnOK();
@@ -1003,6 +1004,7 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 	}
 	delta.EnableDDA();
 	delta.ServoStop();
+	Sleep(100);
 	delta.RenewNowPulse();
 	delta.ResetStatus();
 	delta.GetMotionAveragePulse();
@@ -1020,6 +1022,7 @@ void CECATSampleDlg::OnBnClickedBtnStopme()
 	Sleep(1000); //等待DDA数据运动完毕
 	closeDataThread = true;
 	delta.ServoStop();
+	Sleep(100);
 	delta.DisableDDA();
 	if (status == SIXDOF_STATUS_RUN)
 	{
@@ -1047,6 +1050,7 @@ void CECATSampleDlg::OnBnClickedOk()
 	vision.Close();
 	CloseThread();
 	delta.ServoStop();
+	Sleep(100);
 	delta.ServoAllOnOff(false);
 	delta.LockServo();
 	Sleep(10);
@@ -1140,6 +1144,7 @@ void CECATSampleDlg::OnBnClickedButtonTest()
 		delta.EnableDDA();
 	}
 	delta.ServoStop();
+	Sleep(100);
 	delta.RenewNowPulse();
 	delta.ResetStatus();
 	delta.GetMotionAveragePulse();
@@ -1199,6 +1204,7 @@ void CECATSampleDlg::OnBnClickedButtonTest3()
 		delta.EnableDDA();
 	}
 	delta.ServoStop();
+	Sleep(100);
 	delta.RenewNowPulse();
 	delta.ResetStatus();
 	delta.GetMotionAveragePulse();
