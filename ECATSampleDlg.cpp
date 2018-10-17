@@ -401,24 +401,7 @@ void SixdofControl()
 							}
 							t += 0.00095;
 							delta.SetDDAData(dis);
-						}
-						
-						/*
-						else
-						{
-							delta.RenewNowPulse();
-							auto curveCount = 500.0;
-							for (int i = 0;i < curveCount + 100;++i)
-							{
-								for (int j = 0;j < AXES_COUNT;++j)
-								{
-									auto scale = RANGE((curveCount - i),0, curveCount);
-									dis[j] = delta.NowPluse[j] * scale / curveCount;
-								}
-								delta.SetDDAData(dis);
-							}
-						}*/
-						
+						}					
 					}
 				}
 			}
@@ -978,7 +961,9 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 	}	
 	status = SIXDOF_STATUS_ISRISING;	
 	delta.ResetAlarm();
+	Sleep(100);
 	delta.ResetStatus();
+	Sleep(100);
 	delta.Rise();
 }
 
@@ -1032,7 +1017,7 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 void CECATSampleDlg::OnBnClickedBtnStopme()
 {
 	stopSCurve = true;
-	Sleep(1000);
+	Sleep(1000); //等待DDA数据运动完毕
 	closeDataThread = true;
 	delta.ServoStop();
 	delta.DisableDDA();

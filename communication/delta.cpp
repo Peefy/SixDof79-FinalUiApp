@@ -320,6 +320,16 @@ void MotionControl::Rise()
 		RiseTargetPulse, 0, RISE_VEL, 0, 0.1, 0.1, 2, 1);
 }
 
+void MotionControl::RiseWithSingle()
+{
+	I32 RiseTargetPulse = (I32)(DIS_PER_R * RISE_RPM);
+	for(auto i = 0;i < AXES_NUM;++i)
+	{
+		auto status = _ECAT_Slave_CSP_Start_Move(this->CardNo, this->NodeId[i], this->SlotId[i],
+			RiseTargetPulse, 0, RISE_VEL, 0, 0.1, 0.1, 2, 1);
+	}	
+}
+
 void MotionControl::Middle()
 {
 	I32 pulse_num = 0;

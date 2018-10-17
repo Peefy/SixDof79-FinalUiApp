@@ -52,6 +52,7 @@ public:
     bool ResetStatus();
 	void Csp(I32 * pulse);
 	void Rise();
+ 	void RiseWithSingle();
 	void Middle();
 	void Down();
 	void DownUsingHomeMode();
