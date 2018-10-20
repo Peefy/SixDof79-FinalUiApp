@@ -37,6 +37,20 @@ double MyDeltaPID_Real(PID_Type *This, double now, double set)
 	return This->Delta;
 }
 
+double MyDeltaPIDWithNoDelta(PID_Type *This, double now, double set)
+{
+	This->Now = now;
+	This->Set = set;
+	This->Error = This->Set - This->Now;
+	This->Out = This->Real_P * (This->Error - This->LastError)
+		+ This->Real_I * This->Error
+		+ This->Real_D * (This->Error - 2 * This->LastError + This->PrevError);
+	This->PrevError = This->LastError;
+	This->LastError = This->Error;
+	return This->Out;
+}
+
+
 void MyPidParaInit(PID_Type *This)
 {
 	This->Delta = 0;

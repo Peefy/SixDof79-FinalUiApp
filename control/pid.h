@@ -43,6 +43,7 @@ struct
 
 double MyLocationPID_Real(PID_Type *This, double now, double set);
 double MyDeltaPID_Real(PID_Type *This, double now, double set);
+double MyDeltaPIDWithNoDelta(PID_Type *This, double now, double set);
 void MyPidParaInit(PID_Type *This);
 
 #ifdef __cplusplus
