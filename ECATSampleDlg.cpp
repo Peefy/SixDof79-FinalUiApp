@@ -90,19 +90,6 @@ LandVision vision;
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
-Sensor sensor[SENSOR_COUNT] = 
-{
-	Sensor(SENSOR_PORT1),
-	Sensor(SENSOR_PORT2),
-	Sensor(SENSOR_PORT3),
-};
-
-SensorInfo_t sensorInfo[SENSOR_COUNT];
-SensorInfo_t avrSensorInfo;
-bool isSensorReady;
-
-kalman2_state angle_filter[SENSOR_AXES_NUM];
-
 double controlOut[FREEDOM_NUM];
 
 CChartCtrl m_ChartCtrl1; 
@@ -112,40 +99,6 @@ CChartLineSerie *pLineSerie3;
 CChartLineSerie *pLineSerie4;
 CChartLineSerie *pLineSerie5;
 CChartLineSerie *pLineSerie6;
-
-#if PID_CONTROL_ENABLE 
-
-double Angle_P = 1;
-double Angle_I = 0.05;
-double Angle_D = 0.1;
-double XYZ_P = 1;
-double XYZ_I = 0.1;
-double XYZ_D = 0.1;
-
-PID_Type sensorPidControler[FREEDOM_NUM] = 
-{
-	{ XYZ_P, XYZ_I, XYZ_D, -MAX_XYZ / XYZ_SCALE, MAX_XYZ / XYZ_SCALE },
-	{ XYZ_P, XYZ_I, XYZ_D, -MAX_XYZ / XYZ_SCALE, MAX_XYZ / XYZ_SCALE },
-	{ XYZ_P, XYZ_I, XYZ_D, -MAX_XYZ / XYZ_SCALE, MAX_XYZ / XYZ_SCALE },
-	{ Angle_P, Angle_I, Angle_D, -MAX_DEG / DEG_SCALE, MAX_DEG / DEG_SCALE },
-	{ Angle_P, Angle_I, Angle_D, -MAX_DEG / DEG_SCALE, MAX_DEG / DEG_SCALE },
-	{ Angle_P, Angle_I, Angle_D, -MAX_DEG / DEG_SCALE, MAX_DEG / DEG_SCALE }
-};
-
-#define PID_INNER_OUT_MAX 999999999
-
-double Gyro_P = 1;
-double Gyro_I = 0.1;
-double Gyro_D = 0.1;
-
-PID_Type sensorGyroPidControler[ANGLE_COUNT] = 
-{
-	{ Gyro_P, Gyro_I, Gyro_D, -PID_INNER_OUT_MAX, PID_INNER_OUT_MAX },
-	{ Gyro_P, Gyro_I, Gyro_D, -PID_INNER_OUT_MAX, PID_INNER_OUT_MAX },
-	{ Gyro_P, Gyro_I, Gyro_D, -PID_INNER_OUT_MAX, PID_INNER_OUT_MAX }
-};
-
-#endif
 
 double sin_time_pulse = 0;
 double sin_time_pulse_delta = 0.01;
@@ -271,12 +224,6 @@ void OpenThread()
 
 void SensorRead()
 {
-	for (int i = 0; i < SENSOR_COUNT; ++i)
-	{
-		sensorInfo[i] = sensor[i].ProvideSensorInfo();
-	}
-	isSensorReady = true;
-	avrSensorInfo = GetAverageSenrorValue(sensorInfo, SENSOR_COUNT, &isSensorReady);
 	Sleep(SENSOR_THREAD_DELAY);
 }
 
@@ -816,10 +763,6 @@ void CECATSampleDlg::OnBTNInitialCard()
 {
 	CString xx;
 	InitialFlag = delta.InitCard();
-	for (int i = 0; i < SENSOR_COUNT; ++i)
-	{
-		sensor[i].UpdateOffset();
-	}
 	if (InitialFlag)
 	{
 		xx.Format(_T("%d"), delta.CardNo);
@@ -875,7 +818,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	SetDlgItemText(IDC_EDIT_Pulse, statusStr);
 
 	statusStr.Format(_T("1:%.1f 2:%.1f 3:%.1f 4:%d 5:%d 6:%d"),
-		avrSensorInfo.Roll, avrSensorInfo.Pitch, avrSensorInfo.Yaw,
+		scenedata.Roll, scenedata.Pitch, scenedata.Yaw,
 		scenedata.Roll, scenedata.Pitch, scenedata.Yaw);
 	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
 	
@@ -961,11 +904,15 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 		return;
 	}	
 	status = SIXDOF_STATUS_ISRISING;	
-	delta.ResetAlarm();
-	Sleep(100);
 	delta.ResetStatus();
 	Sleep(100);
-	delta.Rise();
+	for (int i = 0;i < AXES_COUNT;++i)
+	{
+		delta.ResetAlarm();
+		Sleep(50);
+		delta.Rise();
+		Sleep(50);
+	}
 }
 
 void CECATSampleDlg::OnBnClickedBtnMiddle()
@@ -998,10 +945,6 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 		return;
 	}
 	status = SIXDOF_STATUS_RUN;
-	for (int i = 0; i < SENSOR_COUNT; ++i)
-	{
-		sensor[i].UpdateOffset();
-	}
 	delta.EnableDDA();
 	delta.ServoStop();
 	Sleep(100);
@@ -1055,15 +998,6 @@ void CECATSampleDlg::OnBnClickedOk()
 	delta.LockServo();
 	Sleep(10);
 	delta.Close();
-	try
-	{
-		for (int i = 0;i < SENSOR_COUNT;++i)
-			sensor[i].closePort();
-	}
-	catch (CException * e)
-	{
-		e->ReportError();
-	}
 	CDialog::OnOK();
 }
 
@@ -1098,6 +1032,12 @@ void CECATSampleDlg::OnBnClickedBtnSingleDown()
 
 void CECATSampleDlg::OnBnClickedButtonTest()
 {
+	if (status != SIXDOF_STATUS_READY)
+	{
+		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
+		return;
+	}
+	status = SIXDOF_STATUS_RUN;
 	//位移单位mm 角度单位 度
 	auto xval = RANGE(GetCEditNumber(IDC_EDIT_X_VAL), -MAX_XYZ, MAX_XYZ); 
 	auto yval = RANGE(GetCEditNumber(IDC_EDIT_Y_VAL), -MAX_XYZ, MAX_XYZ);
@@ -1128,17 +1068,6 @@ void CECATSampleDlg::OnBnClickedButtonTest()
 	testHz[5] = yawhz;
 	stopSCurve = false;
 	isCsp = false;
-	
-	if (status != SIXDOF_STATUS_READY)
-	{
-		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
-		return;
-	}
-	status = SIXDOF_STATUS_RUN;
-	for (int i = 0; i < SENSOR_COUNT; ++i)
-	{
-		sensor[i].UpdateOffset();
-	}
 	if (isCsp == false)
 	{
 		delta.EnableDDA();
@@ -1162,59 +1091,8 @@ void CECATSampleDlg::OnBnClickedButtonExit()
 
 void CECATSampleDlg::OnBnClickedButtonTest3()
 {
-	//位移单位mm 角度单位 度
-	auto xval = RANGE(GetCEditNumber(IDC_EDIT_X_VAL), -MAX_XYZ, MAX_XYZ);
-	auto yval = RANGE(GetCEditNumber(IDC_EDIT_Y_VAL), -MAX_XYZ, MAX_XYZ);
-	auto zval = RANGE(GetCEditNumber(IDC_EDIT_Z_VAL), -MAX_XYZ, MAX_XYZ);
-	auto rollval = RANGE(GetCEditNumber(IDC_EDIT_ROLL_VAL), -MAX_DEG, MAX_DEG);
-	auto pitchval = RANGE(GetCEditNumber(IDC_EDIT_PITCH_VAL), -MAX_DEG, MAX_DEG);
-	auto yawval = RANGE(GetCEditNumber(IDC_EDIT_YAW_VAL), -MAX_DEG, MAX_DEG);
-	//频率单位1hz
-	auto xhz = RANGE(GetCEditNumber(IDC_EDIT_X_HZ), 0, MAX_HZ);
-	auto yhz = RANGE(GetCEditNumber(IDC_EDIT_Y_HZ), 0, MAX_HZ);
-	auto zhz = RANGE(GetCEditNumber(IDC_EDIT_Z_HZ), 0, MAX_HZ);
-	auto rollhz = RANGE(GetCEditNumber(IDC_EDIT_ROLL_HZ), 0, MAX_HZ);
-	auto pitchhz = RANGE(GetCEditNumber(IDC_EDIT_PITCH_HZ), 0, MAX_HZ);
-	auto yawhz = RANGE(GetCEditNumber(IDC_EDIT_YAW_HZ), 0, MAX_HZ);
-
-	testVal[0] = xval;
-	testVal[1] = yval;
-	testVal[2] = zval;
-	testVal[3] = rollval;
-	testVal[4] = pitchval;
-	testVal[5] = yawval;
-
-	testHz[0] = xhz;
-	testHz[1] = yhz;
-	testHz[2] = zhz;
-	testHz[3] = rollhz;
-	testHz[4] = pitchhz;
-	testHz[5] = yawhz;
-
-	stopSCurve = false;
-	isCsp = false;
-
-	status = SIXDOF_STATUS_RUN;
-	for (int i = 0; i < SENSOR_COUNT; ++i)
-	{
-		sensor[i].UpdateOffset();
-	}
-	if (isCsp == false)
-	{
-		delta.EnableDDA();
-	}
-	delta.ServoStop();
-	Sleep(100);
-	delta.RenewNowPulse();
-	delta.ResetStatus();
-	delta.GetMotionAveragePulse();
-	isTest = true;
-	t = 0;
-	dataChartTime = 0;
-	closeDataThread = false;
-	isStart = true;
+	
 }
-
 
 void CECATSampleDlg::OnBnClickedButtonStopTest()
 {
