@@ -13,6 +13,8 @@
 //ÏÞÎ»º¯Êý
 #define RANGE(x, min, max)   (((x)<(min) ? (min) : ( (x)>(max) ? (max):(x) )))
 
+#define DOWN_RANGE(x, min) ( (x)<(min) ? (min) : (x) )
+
 #define HAEDER_ONE   'p'
 #define HEADER_TWO   146
 

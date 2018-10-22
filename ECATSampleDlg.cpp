@@ -60,8 +60,11 @@ using namespace std;
 #define SHOCK_VAL 5
 #define SHOCK_HZ 5
 
-bool enableShock = true;
-bool enableChirp = true;
+#define ENABLE_CHIRP true
+#define ENABLE_SHOCK true
+
+bool enableShock = ENABLE_SHOCK;
+bool enableChirp = ENABLE_CHIRP;
 bool stopSCurve = false;
 
 void SixdofControl();
@@ -106,9 +109,11 @@ double sin_time_pulse_delta = 0.01;
 bool isStart = false;
 bool isAutoInit = true;
 bool isTest = true;
+bool isCosMode = false;
 
 double testVal[FREEDOM_NUM];
 double testHz[FREEDOM_NUM];
+double testPhase[FREEDOM_NUM];
 
 double chartBottomAxisPoint[CHART_POINT_NUM] = { 0 };
 
@@ -286,7 +291,7 @@ void SixdofControl()
 								pitch = sin(2 * pi * nowHz[4] * nowt + 2 * pi * testHz[4]) * testVal[4];
 								yaw = sin(2 * pi * nowHz[5] * nowt + 2 * pi * testHz[5]) * testVal[5];
 							}
-							else
+							else if (isCosMode == false)
 							{
 								x = sin(2 * pi * nowHz[0] * nowt) * testVal[0];
 								y = sin(2 * pi * nowHz[1] * nowt) * testVal[1];
@@ -294,6 +299,32 @@ void SixdofControl()
 								roll = sin(2 * pi * nowHz[3] * nowt) * testVal[3];
 								pitch = sin(2 * pi * nowHz[4] * nowt) * testVal[4];
 								yaw = sin(2 * pi * nowHz[5] * nowt) * testVal[5];
+							}
+							else
+							{
+
+							}
+							if (isCosMode == true)
+							{
+								double nowphase_t[AXES_COUNT] = {t,t,t,t,t,t};
+								for (int i = 0;i < AXES_COUNT; ++i)
+								{
+									if (nowHz[i] != 0)
+									{
+										auto phase_t = t - 1.0 / nowHz[i] * (testPhase[i] / 360.0);
+										nowphase_t[i] = DOWN_RANGE(phase_t, 0);
+									}			
+									else
+									{
+										nowphase_t[i] = t;
+									}					
+								}
+								x = sin(2 * pi * nowHz[0] * nowphase_t[0]) * testVal[0];
+								y = sin(2 * pi * nowHz[1] * nowphase_t[1]) * testVal[1];
+								z = sin(2 * pi * nowHz[2] * nowphase_t[2]) * testVal[2];
+								roll = sin(2 * pi * nowHz[3] * nowphase_t[3]) * testVal[3];
+								pitch = sin(2 * pi * nowHz[4] * nowphase_t[4]) * testVal[4];
+								yaw = sin(2 * pi * nowHz[5] * nowphase_t[5]) * testVal[5];
 							}
 							data.X = (int16_t)(x * 10);
 							data.Y = (int16_t)(y * 10);
@@ -544,6 +575,13 @@ void CECATSampleDlg::AppInit()
 	SetDlgItemText(IDC_EDIT_PITCH_HZ, _T("0"));
 	SetDlgItemText(IDC_EDIT_YAW_HZ, _T("0"));
 
+	SetDlgItemText(IDC_EDIT_X_PHASE, _T("0"));
+	SetDlgItemText(IDC_EDIT_Y_PHASE, _T("0"));
+	SetDlgItemText(IDC_EDIT_Z_PHASE, _T("0"));
+	SetDlgItemText(IDC_EDIT_ROLL_PHASE, _T("0"));
+	SetDlgItemText(IDC_EDIT_PITCH_PHASE, _T("0"));
+	SetDlgItemText(IDC_EDIT_YAW_PHASE, _T("0"));
+
 	CDialog::SetWindowTextW(_T(WINDOW_TITLE));
 	GetDlgItem(IDC_BTN_Start)->SetWindowTextW(_T(IDC_BTN_START_SHOW_TEXT));
 	GetDlgItem(IDC_BTN_SINGLE_UP)->SetWindowTextW(_T(IDC_BTN_SINGLE_UP_SHOW_TEXT));
@@ -567,6 +605,13 @@ void CECATSampleDlg::AppInit()
 	GetDlgItem(IDC_STATIC_PITCH_HZ)->SetWindowTextW(_T(IDC_STATIC_PITCH_HZ_SHOW_TEXT));
 	GetDlgItem(IDC_STATIC_YAW_HZ)->SetWindowTextW(_T(IDC_STATIC_YAW_HZ_SHOW_TEXT));
 
+	GetDlgItem(IDC_STATIC_X_PHASE)->SetWindowTextW(_T(IDC_STATIC_X_PHASE_SHOW_TEXT));
+	GetDlgItem(IDC_STATIC_Y_PHASE)->SetWindowTextW(_T(IDC_STATIC_Y_PHASE_SHOW_TEXT));
+	GetDlgItem(IDC_STATIC_Z_PHASE)->SetWindowTextW(_T(IDC_STATIC_Z_PHASE_SHOW_TEXT));
+	GetDlgItem(IDC_STATIC_ROLL_PHASE)->SetWindowTextW(_T(IDC_STATIC_ROLL_PHASE_SHOW_TEXT));
+	GetDlgItem(IDC_STATIC_PITCH_PHASE)->SetWindowTextW(_T(IDC_STATIC_PITCH_PHASE_SHOW_TEXT));
+	GetDlgItem(IDC_STATIC_YAW_PHASE)->SetWindowTextW(_T(IDC_STATIC_YAW_PHASE_SHOW_TEXT));
+
 	GetDlgItem(IDC_STATIC_TEST)->SetWindowTextW(_T(IDC_STATIC_TEST_SHOW_TEXT));
 	GetDlgItem(IDC_BUTTON_TEST)->SetWindowTextW(_T(IDC_BUTTON_TEST_SHOW_TEXT));
 
@@ -576,7 +621,6 @@ void CECATSampleDlg::AppInit()
 	font->CreatePointFont(APP_TITLE_FONT_SIZE, _T("Times New Roman"));
 	GetDlgItem(IDC_STATIC_APP_TITLE)->SetFont(font);
 	ChartInit();
-	//com.Start();
 	for (auto i = 1; i <= AXES_COUNT; ++i)
 	{
 		CString xx;
@@ -898,6 +942,7 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 	delta.DownUsingHomeMode();
 	Sleep(100);
 	delta.ReadAllSwitchStatus();
+	Sleep(50);
 	if (delta.IsAllAtBottom() == false)
 	{
 		MessageBox(_T(SIXDOF_NOT_BOTTOM_AND_RISE_MESSAGE));
@@ -906,7 +951,7 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 	status = SIXDOF_STATUS_ISRISING;	
 	delta.ResetStatus();
 	Sleep(100);
-	for (int i = 0;i < AXES_COUNT;++i)
+	for (int i = 0;i < AXES_COUNT; ++i)
 	{
 		delta.ResetAlarm();
 		Sleep(50);
@@ -984,6 +1029,8 @@ void CECATSampleDlg::OnBnClickedBtnStopme()
 
 void CECATSampleDlg::OnBnClickedBtnDown()
 {	
+	delta.ServoStop();
+	Sleep(100);
 	status = SIXDOF_STATUS_ISFALLING;
 	delta.DownUsingHomeMode();
 }
@@ -1006,14 +1053,14 @@ void CECATSampleDlg::OnBnClickedBtnConnect()
 
 }
 
-void CECATSampleDlg::OnBnClickedBtnResetme()
-{
-	delta.ResetStatus();
-}
-
 void CECATSampleDlg::OnBnClickedBtnDisconnect()
 {
 
+}
+
+void CECATSampleDlg::OnBnClickedBtnResetme()
+{
+	delta.ResetStatus();
 }
 
 void CECATSampleDlg::OnBnClickedBtnSingleUp()
@@ -1053,6 +1100,13 @@ void CECATSampleDlg::OnBnClickedButtonTest()
 	auto pitchhz = RANGE(GetCEditNumber(IDC_EDIT_PITCH_HZ), 0, MAX_HZ);
 	auto yawhz = RANGE(GetCEditNumber(IDC_EDIT_YAW_HZ), 0, MAX_HZ);
 
+	auto xphase = RANGE(GetCEditNumber(IDC_EDIT_X_PHASE), 0, MAX_PHASE);
+	auto yphase = RANGE(GetCEditNumber(IDC_EDIT_Y_PHASE), 0, MAX_PHASE);
+	auto zphase = RANGE(GetCEditNumber(IDC_EDIT_Z_PHASE), 0, MAX_PHASE);
+	auto rollphase = RANGE(GetCEditNumber(IDC_EDIT_ROLL_PHASE), 0, MAX_PHASE);
+	auto pitchphase = RANGE(GetCEditNumber(IDC_EDIT_PITCH_PHASE), 0, MAX_PHASE);
+	auto yawphase = RANGE(GetCEditNumber(IDC_EDIT_YAW_PHASE), 0, MAX_PHASE);
+
 	testVal[0] = xval;
 	testVal[1] = yval;
 	testVal[2] = zval;
@@ -1066,6 +1120,25 @@ void CECATSampleDlg::OnBnClickedButtonTest()
 	testHz[3] = rollhz;
 	testHz[4] = pitchhz;
 	testHz[5] = yawhz;
+
+	testPhase[0] = xphase;
+	testPhase[1] = yphase;
+	testPhase[2] = zphase;
+	testPhase[3] = rollphase;
+	testPhase[4] = pitchphase;
+	testPhase[5] = yawphase;
+
+	if (xphase != 0 || yphase != 0 || zphase != 0 || 
+		rollphase != 0 || pitchphase != 0 || yawphase != 0)
+	{
+		enableChirp = false;
+		isCosMode = true;
+	}
+	else
+	{
+		enableChirp = ENABLE_CHIRP;
+		isCosMode = false;
+	}
 	stopSCurve = false;
 	isCsp = false;
 	if (isCsp == false)
