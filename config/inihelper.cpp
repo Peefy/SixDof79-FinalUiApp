@@ -65,7 +65,7 @@ namespace config {
 	{
 		try
 		{
-			ofstream fout(RECORD_FILE_NAME);
+			ofstream fout(RECORD_DOUBLE_FILE_NAME);
 			fout << (int)statusInt << endl;
 			fout << pulse[0] << endl;
 			fout << pulse[1] << endl;
@@ -127,7 +127,7 @@ namespace config {
 	{
 		try
 		{
-			ifstream fin(RECORD_FILE_NAME);
+			ifstream fin(RECORD_DOUBLE_FILE_NAME);
 			fin >> statusInt;
 			fin >> pulse[0];
 			fin >> pulse[1];

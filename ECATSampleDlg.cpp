@@ -861,7 +861,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 		sixdof.PoleLength[3], sixdof.PoleLength[4], sixdof.PoleLength[5]);
 	SetDlgItemText(IDC_EDIT_Pulse, statusStr);
 
-	statusStr.Format(_T("1:%.1f 2:%.1f 3:%.1f 4:%d 5:%d 6:%d"),
+	statusStr.Format(_T("1:%.1f 2:%.1f 3:%.1f 4:%.1f 5:%.1f 6:%.1f"),
 		scenedata.Roll, scenedata.Pitch, scenedata.Yaw,
 		scenedata.Roll, scenedata.Pitch, scenedata.Yaw);
 	SetDlgItemText(IDC_EDIT_Sensor, statusStr);

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 ECATSample.rc 使用
+// Microsoft Visual C++ generated include file.
+// Used by ECATSample.rc
 //
 #define IDD_ECATSAMPLE_DIALOG           102
 #define IDR_MAINFRAME                   128
@@ -86,7 +86,6 @@
 #define IDC_BTN_SINGLE_UP               1057
 #define IDC_BTN_SINGLE_DOWN             1058
 #define IDC_EDIT_PITCH_PHASE            1059
-#define IDC_EDIT_YAW_HZ2                1060
 #define IDC_EDIT_YAW_PHASE              1060
 #define IDC_FRM_STS                     1061
 #define IDC_BTN_PMove                   1077
