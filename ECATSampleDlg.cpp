@@ -949,9 +949,12 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 		return;
 	}	
 	status = SIXDOF_STATUS_ISRISING;	
+	delta.RenewNowPulse();
 	delta.ResetStatus();
+	delta.GetMotionAveragePulse();
 	Sleep(100);
-	for (int i = 0;i < AXES_COUNT; ++i)
+	auto more_time_count = 1;
+	for (auto i = 0;i < more_time_count; ++i)
 	{
 		delta.ResetAlarm();
 		Sleep(50);
@@ -1029,6 +1032,10 @@ void CECATSampleDlg::OnBnClickedBtnStopme()
 
 void CECATSampleDlg::OnBnClickedBtnDown()
 {	
+	if(status == SIXDOF_STATUS_BOTTOM)
+	{
+		return;
+	}
 	delta.ServoStop();
 	Sleep(100);
 	status = SIXDOF_STATUS_ISFALLING;
