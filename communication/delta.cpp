@@ -317,7 +317,7 @@ void MotionControl::Rise()
 		RiseTargetPulse[i] = DIS_PER_R * RISE_RPM;
 	}
 	auto status = _ECAT_Slave_CSP_Start_Multiaxes_Move(this->CardNo, AXES_NUM, this->NodeId, this->SlotId,
-		RiseTargetPulse, 0, RISE_VEL, 0, 0.1, 0.1, 2, 1);
+		RiseTargetPulse, 0, RISE_VEL, 0, 0.1, 0.1, 2, 0);
 }
 
 void MotionControl::RiseWithSingle()
@@ -546,10 +546,11 @@ bool MotionControl::CheckStatus(SixDofPlatformStatus& status)
 		case SIXDOF_STATUS_ISRISING:
 			str = "isrising";
 			pulse = GetMotionAveragePulse();
-			if (pulse >= (RISE_RPM - 1) * PULSE_PER_R)
+			if (pulse >= (RISE_RPM / 2.0) * PULSE_PER_R)
 			{
 				status = SIXDOF_STATUS_READY;
-			}			
+			}	
+			status = SIXDOF_STATUS_READY;
 			break;
 		case SIXDOF_STATUS_ISFALLING:
 			str = "isfalling";			
@@ -576,7 +577,7 @@ bool MotionControl::PowerOnSelfTest(SixDofPlatformStatus laststatus, I32 * lastp
 	switch (laststatus)
 	{
 	case SIXDOF_STATUS_BOTTOM:
-		Down();
+		this->DownUsingHomeMode();
 		break;
 	case SIXDOF_STATUS_READY:
 		//下降
@@ -593,15 +594,15 @@ bool MotionControl::PowerOnSelfTest(SixDofPlatformStatus laststatus, I32 * lastp
 				-lastpulse[i], 0, MIDDLE_VEL, 0, 0.5, 0.5, 2, 0);
 		}
 		//下降
-		Down();
+		this->DownUsingHomeMode();
 		break;
 	case SIXDOF_STATUS_ISRISING:
 		//下降
-		Down();
+		this->DownUsingHomeMode();
 		break;
 	case SIXDOF_STATUS_ISFALLING:
 		//下降
-		Down();
+		this->DownUsingHomeMode();
 		break;
 	default:
 		break;

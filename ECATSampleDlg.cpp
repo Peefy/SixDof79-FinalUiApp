@@ -37,7 +37,6 @@
 #include "glut.h"
 #include "opengl/sixdofopenglhelper.h"
 
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -48,17 +47,17 @@ using namespace std;
 
 #define TIMER_MS 10
 
-#define SIXDOF_CONTROL_DELEY 50
-#define SCENE_THREAD_DELAY 1000
-#define SENSOR_THREAD_DELAY 1000
+#define SIXDOF_CONTROL_DELEY     50
+#define SCENE_THREAD_DELAY       1000
+#define SENSOR_THREAD_DELAY      1000
 #define DATA_BUFFER_THREAD_DELAY 1000
 
-#define DDA_UP_COUNT 400
-#define DDA_ONCE_COUNT 100
+#define DDA_UP_COUNT    400
+#define DDA_ONCE_COUNT  100
 
-#define CHIRP_TIME 5
-#define SHOCK_VAL 5
-#define SHOCK_HZ 5
+#define CHIRP_TIME    5
+#define SHOCK_VAL     0.04
+#define SHOCK_HZ      8
 
 #define ENABLE_CHIRP true
 #define ENABLE_SHOCK true
@@ -684,6 +683,10 @@ BOOL CECATSampleDlg::PreTranslateMessage(MSG* pMsg)
 			GetDlgItem(IDC_EDIT_InitialStatus)->ShowWindow(isShowSingleUpDown);
 			GetDlgItem(IDC_SHOW)->ShowWindow(!isShowSingleUpDown);
 		}
+		if (pMsg->wParam == 'X')
+		{
+			OnBnClickedBtnStopme();
+		}
 	}
 	else if (pMsg->message == WM_KEYUP)
 	{
@@ -864,7 +867,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	statusStr.Format(_T("1:%.1f 2:%.1f 3:%.1f 4:%.1f 5:%.1f 6:%.1f"),
 		scenedata.Roll, scenedata.Pitch, scenedata.Yaw,
 		scenedata.Roll, scenedata.Pitch, scenedata.Yaw);
-	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
+	//SetDlgItemText(IDC_EDIT_Sensor, statusStr);
 	
 	delta.CheckStatus(status);
 	if(InitialFlag == 0)
@@ -949,18 +952,15 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 		return;
 	}	
 	status = SIXDOF_STATUS_ISRISING;	
-	delta.RenewNowPulse();
 	delta.ResetStatus();
-	delta.GetMotionAveragePulse();
-	Sleep(100);
-	auto more_time_count = 1;
+	auto more_time_count = 10;
 	for (auto i = 0;i < more_time_count; ++i)
 	{
 		delta.ResetAlarm();
 		Sleep(50);
-		delta.Rise();
-		Sleep(50);
 	}
+	delta.Rise();
+	Sleep(50);
 }
 
 void CECATSampleDlg::OnBnClickedBtnMiddle()
