@@ -56,7 +56,7 @@ using namespace std;
 #define DDA_ONCE_COUNT  100
 
 #define CHIRP_TIME    5
-#define SHOCK_VAL     0.04
+#define SHOCK_VAL     0.03
 #define SHOCK_HZ      8
 
 #define ENABLE_CHIRP true
@@ -234,25 +234,67 @@ void SensorRead()
 bool isCsp = false;
 U16 Counter = 0;
 
-void SixdofControl()
+void VisionDataDeal()
 {
 	vision.RenewVisionData();
+	if (vision.IsRecievedData == false)
+		return;
+	if (vision.RecieveState.IsConsoleInitial)
+	{
+		if (status == SIXDOF_STATUS_BOTTOM)
+		{
+			
+		}
+		if (status == SIXDOF_STATUS_READY)
+		{
+
+		}
+	}
+	if (vision.RecieveState.IsConsoleZero)
+	{
+		if (status == SIXDOF_STATUS_RUN)
+		{
+
+		}
+		if (status == SIXDOF_STATUS_READY)
+		{
+
+		}
+	}
+	if (vision.RecieveState.IsShockOff == true)
+	{
+		//enableShock = false;
+	}
+	else if(vision.RecieveState.IsShockOn== true)
+	{
+		//enableShock = true;
+	}
+	if (vision.RecieveState.GetFunction(7) == true)
+	{
+		//vision.SendVisionData();
+	}
+}
+
+void SixdofControl()
+{
+	VisionDataDeal();
 	if(closeDataThread == false)
 	{	
 		U16 upCount = DDA_UP_COUNT;
 		DWORD start_time = 0;
 		start_time = GetTickCount();
-		auto delay = SIXDOF_CONTROL_DELEY;
+		auto delay = isTest == true ? SIXDOF_CONTROL_DELEY : 10;
+		auto onceCount = isTest == true ? DDA_ONCE_COUNT : 1;
 		if (isCsp == false)
 		{
-			delay = SIXDOF_CONTROL_DELEY;
+			delay = isTest == true ? SIXDOF_CONTROL_DELEY : 10;
 			Counter = delta.GetDDACount();
 			if (Counter < upCount)
 			{
 				I32 dis[AXES_COUNT] = {DIS_PER_R, DIS_PER_R, DIS_PER_R, DIS_PER_R, DIS_PER_R, DIS_PER_R};
 				if (true)
 				{
-					for (auto i = 0; i < DDA_ONCE_COUNT; ++i)
+					for (auto i = 0; i < onceCount; ++i)
 					{
 						// 正弦测试运动
 						if (isTest == true)
@@ -354,19 +396,19 @@ void SixdofControl()
 							double pi = 3.1415926;
 							double shockVal = SHOCK_VAL;
 							double shockHz = SHOCK_HZ;
-							data.X = 0;
-							data.Y = 0;
-							data.Z = 0;
-							data.Roll = vision.Roll / DEG_SCALE;
-							data.Yaw = vision.Yaw / DEG_SCALE;
-							data.Pitch = vision.Pitch / DEG_SCALE;
+							data.X = (int16_t)(vision.X * 10);
+							data.Y = (int16_t)(vision.Y * 10);
+							data.Z = (int16_t)(vision.Z * 10);
+							data.Roll = (int16_t)(vision.Roll * 100);
+							data.Yaw = (int16_t)(vision.Yaw * 100);
+							data.Pitch = (int16_t)(vision.Pitch * 100);
 							auto shockz = sin(2 * pi * shockHz * t) * shockVal;
-							auto x = RANGE(data.X * XYZ_SCALE, -MAX_XYZ, MAX_XYZ);
-							auto y = RANGE(data.Y * XYZ_SCALE, -MAX_XYZ, MAX_XYZ);
-							auto z = RANGE(data.Z * XYZ_SCALE, -MAX_XYZ, MAX_XYZ);
-							auto roll = RANGE(data.Roll * DEG_SCALE, -MAX_DEG, MAX_DEG);
-							auto pitch = RANGE(data.Pitch * DEG_SCALE, -MAX_DEG, MAX_DEG);
-							auto yaw = RANGE(data.Yaw * DEG_SCALE, -MAX_DEG, MAX_DEG);
+							auto x = RANGE(vision.X, -VISION_MAX_XYZ, VISION_MAX_XYZ);
+							auto y = RANGE(vision.Y, -VISION_MAX_XYZ, VISION_MAX_XYZ);
+							auto z = RANGE(vision.Z, -VISION_MAX_XYZ, VISION_MAX_XYZ);
+							auto roll = RANGE(vision.Roll, -VISION_MAX_DEG, VISION_MAX_DEG);
+							auto pitch = RANGE(vision.Pitch, -VISION_MAX_DEG, VISION_MAX_DEG);
+							auto yaw = RANGE(vision.Yaw, -VISION_MAX_DEG, VISION_MAX_DEG);
 							z += (enableShock == true ? shockz : 0);
 							double* pulse_dugu = Control(x, y, z + shockz, roll, yaw, pitch);
 							for (auto ii = 0; ii < AXES_COUNT; ++ii)
@@ -376,8 +418,8 @@ void SixdofControl()
 								auto pulse = pulse_cal[ii];
 								dis[ii] = (int)pulse;
 							}
-							t += 0.00095;
-							delta.SetDDAData(dis);
+							t += 0.01;
+							delta.Csp(dis);
 						}					
 					}
 				}
@@ -864,10 +906,10 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 		sixdof.PoleLength[3], sixdof.PoleLength[4], sixdof.PoleLength[5]);
 	SetDlgItemText(IDC_EDIT_Pulse, statusStr);
 
-	statusStr.Format(_T("1:%.1f 2:%.1f 3:%.1f 4:%.1f 5:%.1f 6:%.1f"),
-		scenedata.Roll, scenedata.Pitch, scenedata.Yaw,
-		scenedata.Roll, scenedata.Pitch, scenedata.Yaw);
-	//SetDlgItemText(IDC_EDIT_Sensor, statusStr);
+	statusStr.Format(_T("1:%.2f 2:%.2f 3:%.2f 4:%.2f 5:%.2f 6:%.2f"),
+		vision.X, vision.Y, vision.Z,
+		vision.Roll, vision.Pitch, vision.Yaw);
+	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
 	
 	delta.CheckStatus(status);
 	if(InitialFlag == 0)
@@ -993,8 +1035,8 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 		return;
 	}
 	status = SIXDOF_STATUS_RUN;
-	delta.EnableDDA();
-	delta.ServoStop();
+	//delta.EnableDDA();
+	//delta.ServoStop();
 	Sleep(100);
 	delta.RenewNowPulse();
 	delta.ResetStatus();
@@ -1015,6 +1057,7 @@ void CECATSampleDlg::OnBnClickedBtnStopme()
 	delta.ServoStop();
 	Sleep(100);
 	delta.DisableDDA();
+	delta.ServoAllOnOff(true);
 	if (status == SIXDOF_STATUS_RUN)
 	{
 		if (stopAndMiddle == true)

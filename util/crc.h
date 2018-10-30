@@ -6,7 +6,9 @@
 extern "C" {
 #endif // __cplusplus
 
-USHORT usMBCRC16( UCHAR * pucFrame, USHORT usLen );
+#include "stdint.h"
+
+uint16_t usMBCRC16(char * pucFrame, uint16_t  usLen );
 
 #ifdef __cplusplus
 }

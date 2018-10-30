@@ -8,9 +8,11 @@
 #include "../TYPE_DEF.H"
 
 //平台运动最大角度
+#define VISION_MAX_DEG 9.5
 #define MAX_DEG 10.5
 #define DEG_SCALE 0.01
 //平台运动最大位移
+#define VISION_MAX_XYZ 95.0
 #define MAX_XYZ 105
 #define XYZ_SCALE 0.1
 // 平台运动最大频率
