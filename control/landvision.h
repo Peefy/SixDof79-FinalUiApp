@@ -30,11 +30,26 @@
 
 typedef enum 
 {
-	FlatLand = 0,
-	Cement = 1,
-	Sandy = 2,
-	Ice = 3,
-	Solid = 4
+	//平地
+	RoadTypeFlatLand = 0,
+	//山路
+	RoadTypeMountain = 11,
+	//卵石路
+	RoadTypeStone = 21,
+	//草地1
+	RoadTypeGrass1 = 31,
+	//草地2
+	RoadTypeGrass2 = 32,
+	//草地3
+	RoadTypeGrass3 = 33,
+	//草地4
+	RoadTypeGrass4 = 34,
+	//草地5
+	RoadTypeGrass5 = 35,
+	//柏油路
+	RoadTypeAsphalt = 41,
+	//水泥路
+	RoadTypeCement = 51
 }RoadType;
 
 #pragma pack (1)
@@ -53,7 +68,7 @@ typedef struct
 	// 单位0.1度/s
 	int16_t YAcc;
 	// 路面类型
-	uint8_t RoadTypeTemp;
+	uint8_t RoadTypeBefore;
 	uint8_t RoadType;
 	// 单位0.01度
 	int16_t Pitch;
@@ -155,8 +170,9 @@ public:
 	~LandVision();
 	void RenewVisionData();
 	void SendVisionData();
-	void DoConsoleInit();
-	void DoConsoleZero();
+	bool GetIsShock();
+	double GetShockHzFromRoadType();
+	double GetShockValFromRoadType();
 	double X;
 	double Y;
 	double Z;
@@ -166,7 +182,6 @@ public:
 	double Roll;
 	double Yaw;
 	double Pitch;	
-	uint16_t Crc;
 	RoadType NowRoadType;
 	// Recieve State
 	LandVisionRecieveState RecieveState;

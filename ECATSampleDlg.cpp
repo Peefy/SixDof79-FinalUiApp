@@ -56,12 +56,11 @@ using namespace std;
 #define DDA_ONCE_COUNT  100
 
 #define CHIRP_TIME    5
-#define SHOCK_VAL     0.03
-#define SHOCK_HZ      8
+#define ENABLE_CHIRP  true
+#define ENABLE_SHOCK  true
 
-#define ENABLE_CHIRP true
-#define ENABLE_SHOCK true
-
+double ShockVal = 0.03;
+double ShockHz = 8.0;
 bool enableShock = ENABLE_SHOCK;
 bool enableChirp = ENABLE_CHIRP;
 bool stopSCurve = false;
@@ -91,6 +90,8 @@ LandVision vision;
 
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
+
+MovingAverageFilterType rollFiter = {64};
 
 double controlOut[FREEDOM_NUM];
 
@@ -243,35 +244,67 @@ void VisionDataDeal()
 	{
 		if (status == SIXDOF_STATUS_BOTTOM)
 		{
-			
+			delta.DownUsingHomeMode();
+			Sleep(100);
+			delta.ReadAllSwitchStatus();
+			Sleep(50);
+			if (delta.IsAllAtBottom() == false)
+			{
+				return;
+			}	
+			status = SIXDOF_STATUS_ISRISING;	
+			delta.ResetStatus();
+			auto more_time_count = 10;
+			for (auto i = 0;i < more_time_count; ++i)
+			{
+				delta.ResetAlarm();
+				Sleep(50);
+			}
+			delta.Rise();
+			Sleep(50);
+			Sleep(4000);
+			status = SIXDOF_STATUS_RUN;
+			delta.RenewNowPulse();
+			delta.ResetStatus();
+			delta.GetMotionAveragePulse();
+			isTest = false;
+			sin_time_pulse = 0;
+			t = 0;
+			dataChartTime = 0;
+			closeDataThread = false;
+			isStart = true;	
 		}
 		if (status == SIXDOF_STATUS_READY)
 		{
-
+			status = SIXDOF_STATUS_RUN;
+			delta.RenewNowPulse();
+			delta.ResetStatus();
+			delta.GetMotionAveragePulse();
+			isTest = false;
+			sin_time_pulse = 0;
+			t = 0;
+			dataChartTime = 0;
+			closeDataThread = false;
+			isStart = true;	
 		}
 	}
 	if (vision.RecieveState.IsConsoleZero)
 	{
 		if (status == SIXDOF_STATUS_RUN)
 		{
-
+			stopSCurve = true;
+			closeDataThread = true;
+			delta.MoveToZeroPulseNumber();
+			status = SIXDOF_STATUS_READY;
+			ResetDefaultData(&data);
 		}
-		if (status == SIXDOF_STATUS_READY)
-		{
-
-		}
 	}
-	if (vision.RecieveState.IsShockOff == true)
-	{
-		//enableShock = false;
-	}
-	else if(vision.RecieveState.IsShockOn== true)
-	{
-		//enableShock = true;
-	}
+	enableShock = vision.GetIsShock();
+	ShockHz = vision.GetShockHzFromRoadType();
+	ShockVal = vision.GetShockValFromRoadType();
 	if (vision.RecieveState.GetFunction(7) == true)
 	{
-		//vision.SendVisionData();
+		vision.SendVisionData();
 	}
 }
 
@@ -394,8 +427,8 @@ void SixdofControl()
 						else
 						{
 							double pi = 3.1415926;
-							double shockVal = SHOCK_VAL;
-							double shockHz = SHOCK_HZ;
+							double shockVal = ShockVal;
+							double shockHz = ShockHz;
 							data.X = (int16_t)(vision.X * 10);
 							data.Y = (int16_t)(vision.Y * 10);
 							data.Z = (int16_t)(vision.Z * 10);
@@ -406,7 +439,7 @@ void SixdofControl()
 							auto x = RANGE(vision.X, -VISION_MAX_XYZ, VISION_MAX_XYZ);
 							auto y = RANGE(vision.Y, -VISION_MAX_XYZ, VISION_MAX_XYZ);
 							auto z = RANGE(vision.Z, -VISION_MAX_XYZ, VISION_MAX_XYZ);
-							auto roll = RANGE(vision.Roll, -VISION_MAX_DEG, VISION_MAX_DEG);
+							auto roll = RANGE(MyMAFilter(&rollFiter, vision.Roll), -VISION_MAX_DEG, VISION_MAX_DEG);
 							auto pitch = RANGE(vision.Pitch, -VISION_MAX_DEG, VISION_MAX_DEG);
 							auto yaw = RANGE(vision.Yaw, -VISION_MAX_DEG, VISION_MAX_DEG);
 							z += (enableShock == true ? shockz : 0);
@@ -1035,8 +1068,6 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 		return;
 	}
 	status = SIXDOF_STATUS_RUN;
-	//delta.EnableDDA();
-	//delta.ServoStop();
 	Sleep(100);
 	delta.RenewNowPulse();
 	delta.ResetStatus();

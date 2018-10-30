@@ -7,6 +7,59 @@
 #include "Com.h"
 #include "../util/crc.h"
 
+inline int16_t ExchangeBit8(int16_t data)
+{
+	return (uint16_t)((((uint8_t)data) << 8) + (uint8_t)(data >> 8));
+}
+
+inline uint16_t CalCrc(LandVisionPackage *data)
+{
+	uint16_t crc = 0;
+	crc += (uint8_t)data->X;
+	crc += (uint8_t)(data->X >> 8);
+	crc += (uint8_t)data->Y;
+	crc += (uint8_t)(data->Y >> 8);
+	crc += (uint8_t)data->Z;
+	crc += (uint8_t)(data->Z >> 8);
+	crc += (uint8_t)data->XAcc;
+	crc += (uint8_t)(data->XAcc >> 8);
+	crc += (uint8_t)data->YAcc;
+	crc += (uint8_t)(data->YAcc >> 8);
+	crc += (uint8_t)data->RoadTypeBefore;
+	crc += (uint8_t)data->RoadType;
+	crc += (uint8_t)data->Pitch;
+	crc += (uint8_t)(data->Pitch >> 8);
+	crc += (uint8_t)data->Roll;
+	crc += (uint8_t)(data->Roll >> 8);
+	crc += (uint8_t)data->ControlByte;
+	crc += (uint8_t)data->NoneByte;
+	crc += (uint8_t)data->CmdPcDataAcksByte;
+	crc += (uint8_t)data->FunctionsByte;
+	return crc;
+}
+
+inline uint16_t CalCrc(LandVisionSendPackage *data)
+{
+	uint16_t crc = 0;
+	crc += (uint8_t)(data->PulseCount1 >> 8);
+	crc += (uint8_t)data->PulseCount1;
+	crc += (uint8_t)(data->PulseCount2 >> 8);
+	crc += (uint8_t)data->PulseCount2;
+	crc += (uint8_t)(data->PulseCount3 >> 8);
+	crc += (uint8_t)data->PulseCount3;
+	crc += (uint8_t)(data->PulseCount4 >> 8);
+	crc += (uint8_t)data->PulseCount4;
+	crc += (uint8_t)(data->PulseCount5 >> 8);
+	crc += (uint8_t)data->PulseCount5;
+	crc += (uint8_t)(data->PulseCount6 >> 8);
+	crc += (uint8_t)data->PulseCount6;
+	crc += (uint8_t)data->StateByteOne;
+	crc += (uint8_t)data->StateByteTwo;
+	crc += (uint8_t)data->StateByteThree;
+	crc += (uint8_t)data->StateByteFour;
+	return crc;
+}
+
 LandVision::LandVision() : BaseCom(VISION_RECIEVE_HAEDER, VISION_RECIEVE_HAEDER)
 {
 	RecievePackageLength = sizeof(LandVisionPackage);
@@ -37,38 +90,18 @@ void LandVision::RenewVisionData()
 	auto data = this->GetDataFromCom();
 	if (this->IsRecievedData == false)
 		return;
-	Crc = 0;
-	Crc += (uint8_t)data.X;
-	Crc += (uint8_t)(data.X >> 8);
-	Crc += (uint8_t)data.Y;
-	Crc += (uint8_t)(data.Y >> 8);
-	Crc += (uint8_t)data.Z;
-	Crc += (uint8_t)(data.Z >> 8);
-	Crc += (uint8_t)data.XAcc;
-	Crc += (uint8_t)(data.XAcc >> 8);
-	Crc += (uint8_t)data.YAcc;
-	Crc += (uint8_t)(data.YAcc >> 8);
-	Crc += (uint8_t)data.RoadTypeTemp;
-	Crc += (uint8_t)data.RoadType;
-	Crc += (uint8_t)data.Pitch;
-	Crc += (uint8_t)(data.Pitch >> 8);
-	Crc += (uint8_t)data.Roll;
-	Crc += (uint8_t)(data.Roll >> 8);
-	Crc += (uint8_t)data.ControlByte;
-	Crc += (uint8_t)data.NoneByte;
-	Crc += (uint8_t)data.CmdPcDataAcksByte;
-	Crc += (uint8_t)data.FunctionsByte;
-	auto recieveCrc = (uint16_t)((((uint8_t)data.Crc) << 8) + (uint8_t)(data.Crc >> 8));
-	if (data.Header == VISION_RECIEVE_HAEDER && data.Tail == VISION_RECIEVE_TAIL && Crc == recieveCrc)
+	auto crc = CalCrc(&data);
+	auto recieveCrc = (uint16_t)ExchangeBit8(data.Crc);
+	if (data.Header == VISION_RECIEVE_HAEDER && data.Tail == VISION_RECIEVE_TAIL && crc == recieveCrc)
 	{
-		Y = -(int16_t)((((uint8_t)data.X) << 8) + (uint8_t)(data.X >> 8)) * VISION_XYZ_SCALE;
-		X = (int16_t)((((uint8_t)data.Y) << 8) + (uint8_t)(data.Y >> 8)) * VISION_XYZ_SCALE;
-		Z = (int16_t)((((uint8_t)data.Z) << 8) + (uint8_t)(data.Z >> 8)) * VISION_XYZ_SCALE;
-		YAcc = -(int16_t)((((uint8_t)data.XAcc) << 8) + (uint8_t)(data.XAcc >> 8)) * VISION_ACC_SCALE;
-		XAcc = (int16_t)((((uint8_t)data.YAcc) << 8) + (uint8_t)(data.YAcc >> 8)) * VISION_ACC_SCALE;
+		Y = -ExchangeBit8(data.X) * VISION_XYZ_SCALE;
+		X = ExchangeBit8(data.Y) * VISION_XYZ_SCALE;
+		Z = ExchangeBit8(data.Z) * VISION_XYZ_SCALE;
+		YAcc = -ExchangeBit8(data.XAcc) * VISION_ACC_SCALE;
+		XAcc = ExchangeBit8(data.YAcc) * VISION_ACC_SCALE;
 		ZAcc = 0;
-		Roll = (int16_t)((((uint8_t)data.Pitch) << 8) + (uint8_t)(data.Pitch >> 8)) * VISION_ANGLE_SCALE;
-		Pitch = -(int16_t)((((uint8_t)data.Roll) << 8) + (uint8_t)(data.Roll >> 8)) * VISION_ANGLE_SCALE;
+		Roll = ExchangeBit8(data.Pitch) * VISION_ANGLE_SCALE;
+		Pitch = -ExchangeBit8(data.Roll) * VISION_ANGLE_SCALE;
 		Yaw = 0;
 		NowRoadType = (RoadType)data.RoadType;
 		RecieveState.IsConsoleInitial = VISION_BIT_GET(data.ControlByte, 0);
@@ -89,12 +122,12 @@ void LandVision::SendVisionData()
 	LandVisionSendPackage sendPackage;
 	sendPackage.Header = VISION_SEND_HAEDER;
 	sendPackage.Tail = VISION_SEND_TAIL;
-	sendPackage.PulseCount1 = SendState.PoleLength[0];
-	sendPackage.PulseCount2 = SendState.PoleLength[1];
-	sendPackage.PulseCount3 = SendState.PoleLength[2];
-	sendPackage.PulseCount4 = SendState.PoleLength[3];
-	sendPackage.PulseCount5 = SendState.PoleLength[4];
-	sendPackage.PulseCount6 = SendState.PoleLength[5];
+	sendPackage.PulseCount1 = ExchangeBit8(SendState.PoleLength[0]);
+	sendPackage.PulseCount2 = ExchangeBit8(SendState.PoleLength[1]);
+	sendPackage.PulseCount3 = ExchangeBit8(SendState.PoleLength[2]);
+	sendPackage.PulseCount4 = ExchangeBit8(SendState.PoleLength[3]);
+	sendPackage.PulseCount5 = ExchangeBit8(SendState.PoleLength[4]);
+	sendPackage.PulseCount6 = ExchangeBit8(SendState.PoleLength[5]);
 
 	VISION_BIT_SET_VAL(sendPackage.StateByteOne, 0, SendState.IsServoAlarm[0]);
 	VISION_BIT_SET_VAL(sendPackage.StateByteOne, 1, SendState.IsServoAlarm[1]);
@@ -132,20 +165,33 @@ void LandVision::SendVisionData()
 	VISION_BIT_SET_VAL(sendPackage.StateByteFour, 6, SendState.IsLockAlarm);
 	VISION_BIT_SET_VAL(sendPackage.StateByteFour, 7, SendState.IsServoPowerAlarm);
 
-	memcpy(sendBytes, &sendPackage, SendPackageLength);
-	sendPackage.Crc = usMBCRC16(&sendBytes[1], SendPackageLength - 4); 
+	sendPackage.Crc = ExchangeBit8(CalCrc(&sendPackage));
 	memcpy(sendBytes, &sendPackage, SendPackageLength);
 
 	SendUARTMessageLength(VISION_PORT, sendBytes, SendPackageLength);
 	delete[] sendBytes;
 }
 
-void LandVision::DoConsoleInit()
+bool LandVision::GetIsShock()
 {
-
+	bool enableShock = false;
+	if (RecieveState.IsShockOff == true)
+	{
+		enableShock = false;
+	}
+	else if(RecieveState.IsShockOn == true)
+	{
+		enableShock = true;
+	}
+	return enableShock;
 }
 
-void LandVision::DoConsoleZero()
+double LandVision::GetShockHzFromRoadType()
 {
+	return 8.0;
+}
 
+double LandVision::GetShockValFromRoadType()
+{
+	return 0.03;
 }

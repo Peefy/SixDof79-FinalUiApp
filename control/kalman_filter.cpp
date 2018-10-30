@@ -199,3 +199,17 @@ float kalman2_filter(kalman2_state *state, float z_measure)
 
 	return state->x[0];
 }
+
+double MyMAFilter(MovingAverageFilterType* This, double InputData)
+{
+	uint8_t Index_Temp = 0;
+	This->DataTotal = 0;
+	This->Now = InputData;
+	This->DataHistory[This->Rear] = This->Now;
+	if(++This->Rear >= This->FilterLevel) This->Rear = 0;
+	for(Index_Temp = 0;Index_Temp < This->FilterLevel ; ++Index_Temp)	
+	{
+		This->DataTotal += This->DataHistory[Index_Temp];
+	}
+	return This->DataTotal / (double)This->FilterLevel;
+}

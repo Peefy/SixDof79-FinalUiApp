@@ -2,6 +2,8 @@
 #ifndef _KALMAN_FILTER_H_
 #define _KALMAN_FILTER_H_
 
+#include "stdint.h"
+
 typedef struct {
 	float x;  /* state */
 	float A;  /* x(n)=A*x(n-1)+u(n),u(n)~N(0,q) */
@@ -29,5 +31,19 @@ extern void kalman1_init(kalman1_state *state, float init_x, float init_p);
 extern float kalman1_filter(kalman1_state *state, float z_measure);
 extern void kalman2_init(kalman2_state *state, float *init_x, float(*init_p)[2]);
 extern float kalman2_filter(kalman2_state *state, float z_measure);
+
+#define FILTER_DATA_NUM 256
+struct MovingAverageFilterType
+{
+	//public:
+	unsigned char FilterLevel;	
+	//private:					
+	double DataHistory[FILTER_DATA_NUM];		
+	double DataTotal;			
+	double Now;
+	unsigned char Rear;
+}MovingAverageFilter_Type;
+
+double MyMAFilter(MovingAverageFilterType* This, double InputData);
 
 #endif
