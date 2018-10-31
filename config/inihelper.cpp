@@ -6,21 +6,21 @@
 #include "../json/reader.h"
 #include "../json/writer.h"
 
-#define JSON_FILE_NAME "config.json"
-#define JSON_STOP_AND_MIDDLE_KEY "stopAndMiddle"
+#define JSON_FILE_NAME                "config.json"
+#define JSON_STOP_AND_MIDDLE_KEY      "stopAndMiddle"
 
-#define FILE_NAME "config.ini"
-#define RECORD_FILE_NAME "record.txt"
-#define RECORD_DOUBLE_FILE_NAME "recorddouble.txt"
-#define DUGU_CONFIG_NAME "duguconfig.ini"
-#define SERIALPORT_APPNAME "serialport"
-#define SERIALPORT_BAUD_KEY  "baudrate"
-#define SERIALPORT_ISUSE_KEY "isuse"
+#define FILE_NAME                     "config.ini"
+#define RECORD_FILE_NAME              "record.txt"
+#define RECORD_DOUBLE_FILE_NAME       "recorddouble.txt"
+#define DUGU_CONFIG_NAME              "duguconfig.ini"
+#define SERIALPORT_APPNAME            "serialport"
+#define SERIALPORT_BAUD_KEY           "baudrate"
+#define SERIALPORT_ISUSE_KEY          "isuse"
 
-#define DEFAULT_SERIAL_BAUD     57600
-#define DEFAULT_SERIAL_BAUD_STR  "57600"
-#define DEFAULT_SERIAL_ISUSE_STR  true
-#define DEFAULT_PORT_NUM 1
+#define DEFAULT_SERIAL_BAUD           57600
+#define DEFAULT_SERIAL_BAUD_STR       "57600"
+#define DEFAULT_SERIAL_ISUSE_STR      true
+#define DEFAULT_PORT_NUM              1
 
 #define DEFAULT_LENGTH_TO_PULSE_SCALE 40000
 
