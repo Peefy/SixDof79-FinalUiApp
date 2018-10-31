@@ -131,6 +131,9 @@ double dataChartTime = 0;
 
 double t = 0;
 
+bool isCsp = false;
+U16 Counter = 0;
+
 DWORD WINAPI DataTransThread(LPVOID pParam)
 {
 	while (true)
@@ -231,9 +234,6 @@ void SensorRead()
 {
 	Sleep(SENSOR_THREAD_DELAY);
 }
-
-bool isCsp = false;
-U16 Counter = 0;
 
 void VisionDataDeal()
 {
@@ -380,7 +380,7 @@ void SixdofControl()
 							}
 							if (isCosMode == true)
 							{
-								double nowphase_t[AXES_COUNT] = {t,t,t,t,t,t};
+								double nowphase_t[AXES_COUNT] = {t, t, t, t, t, t};
 								for (int i = 0;i < AXES_COUNT; ++i)
 								{
 									if (nowHz[i] != 0)

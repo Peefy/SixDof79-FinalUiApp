@@ -22,10 +22,10 @@ public:
 	uint8_t DefaultPackageHeaderTwo;
 	int PortNumber;
 	int BaudRate;
+	bool IsRecievedData;
 	bool Open(int portNumber, int baudRate);
 	bool Close();
 	T GetDataFromCom();
-	bool IsRecievedData;
 	T Data;
 private:
 	BaseCom();

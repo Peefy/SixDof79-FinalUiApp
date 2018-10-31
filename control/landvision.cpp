@@ -188,10 +188,80 @@ bool LandVision::GetIsShock()
 
 double LandVision::GetShockHzFromRoadType()
 {
-	return 8.0;
+	switch (NowRoadType)
+	{
+		//平地
+		case RoadTypeFlatLand:
+			return 8.0;
+			//山路
+		case RoadTypeMountain:
+			return 5.0;
+			//卵石路
+		case RoadTypeStone:
+			return 7.0;
+			//草地1
+		case RoadTypeGrass1:
+			return 1.0;
+			//草地2
+		case RoadTypeGrass2:
+			return 2.0;
+			//草地3
+		case RoadTypeGrass3:
+			return 3.0;
+			//草地4
+		case RoadTypeGrass4:
+			return 4.0;
+			//草地5
+        case RoadTypeGrass5:
+			return 5.0;
+			//柏油路
+		case RoadTypeAsphalt:
+			return 8.0;
+			//水泥路
+		case RoadTypeCement:
+			return 0.5;
+		default:
+			return 0.0;
+	}
+	return 0.0;
 }
 
 double LandVision::GetShockValFromRoadType()
 {
-	return 0.03;
+	switch (NowRoadType)
+	{
+		//平地
+	case RoadTypeFlatLand:
+		return 0.03;
+		//山路
+	case RoadTypeMountain:
+		return 0.08;
+		//卵石路
+	case RoadTypeStone:
+		return 0.05;
+		//草地1
+	case RoadTypeGrass1:
+		return 0.04;
+		//草地2
+	case RoadTypeGrass2:
+		return 0.04;
+		//草地3
+	case RoadTypeGrass3:
+		return 0.04;
+		//草地4
+	case RoadTypeGrass4:
+		return 0.04;
+		//草地5
+	case RoadTypeGrass5:
+		return 0.04;
+		//柏油路
+	case RoadTypeAsphalt:
+		return 0.05;
+		//水泥路
+	case RoadTypeCement:
+		return 0.8;
+	default:
+		return 0.0;
+	}
+	return 0.0;
 }
