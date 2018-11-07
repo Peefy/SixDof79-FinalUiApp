@@ -165,7 +165,7 @@ void LandVision::SendVisionData()
 	VISION_BIT_SET_VAL(sendPackage.StateByteFour, 6, SendState.IsLockAlarm);
 	VISION_BIT_SET_VAL(sendPackage.StateByteFour, 7, SendState.IsServoPowerAlarm);
 
-	sendPackage.Crc = ExchangeBit8(CalCrc(&sendPackage));
+	sendPackage.Crc = ExchangeBit8(CalCrc(&sendPackage)); 
 	memcpy(sendBytes, &sendPackage, SendPackageLength);
 
 	SendUARTMessageLength(VISION_PORT, sendBytes, SendPackageLength);
