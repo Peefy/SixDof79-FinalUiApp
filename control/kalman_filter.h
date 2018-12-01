@@ -33,7 +33,7 @@ extern void kalman2_init(kalman2_state *state, float *init_x, float(*init_p)[2])
 extern float kalman2_filter(kalman2_state *state, float z_measure);
 
 #define FILTER_DATA_NUM 256
-struct MovingAverageFilterType
+typedef struct 
 {
 	//public:
 	unsigned char FilterLevel;	
@@ -42,7 +42,7 @@ struct MovingAverageFilterType
 	double DataTotal;			
 	double Now;
 	unsigned char Rear;
-}MovingAverageFilter_Type;
+}MovingAverageFilterType;
 
 double MyMAFilter(MovingAverageFilterType* This, double InputData);
 
