@@ -19,4 +19,13 @@ namespace util
 		}
 		return max;
 	}
+
+	double PutRadIn(double rad, double minrad, double maxrad)
+	{
+		while (rad <= minrad)
+			rad += 2 * 3.1415926;
+		while (rad >= maxrad)
+			rad -= 2 * 3.1415926;
+		return rad;
+	}
 }

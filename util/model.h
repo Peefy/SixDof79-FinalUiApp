@@ -27,6 +27,7 @@ namespace util
 		int Id;
 	};
 	double MaxValue(double * vals, int valnum);
+	double PutRadIn(double rad, double minrad = 0, double maxrad = 2 * 3.1415926);
 }
 
 #endif

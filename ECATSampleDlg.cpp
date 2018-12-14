@@ -55,7 +55,7 @@ using namespace std;
 #define DDA_UP_COUNT    400
 #define DDA_ONCE_COUNT  100
 
-#define CHIRP_TIME    5
+#define CHIRP_TIME    2.5
 #define ENABLE_CHIRP  true
 #define ENABLE_SHOCK  true
 
@@ -342,6 +342,7 @@ void SixdofControl()
 							double roll = 0;
 							double pitch = 0;
 							double yaw = 0;
+							double stopTime = 0;
 							if (t <= chirpTime && enableChirp == true)
 							{
 								for (auto i = 0; i < AXES_COUNT; ++i)
@@ -417,11 +418,16 @@ void SixdofControl()
 							t += 0.00095;
 							if (stopSCurve == true)
 							{
-								if ((testHz[0] - x) <= 0.001 && (testHz[1] - y) <= 0.001 && (testHz[2] - z) <= 0.001 && 
-									(testHz[3] - roll) <= 0.001 && (testHz[4] - pitch) <= 0.001 && (testHz[5] - yaw) <= 0.001)
-									t -= 0.00095;
+								auto maxHz = util::MaxValue(testHz, AXES_COUNT);
+								auto val = 2 * pi * maxHz * (nowt + 1);
+								auto rangeval = util::PutRadIn(val, 0, 2 * pi);
+								stopTime = nowt + (2.5 * pi - rangeval) / (2 * pi * maxHz);	
+								stopSCurve = false;
 							}
-							delta.SetDDAData(dis);
+							if (stopTime == 0 || nowt < stopTime) 
+							{
+								delta.SetDDAData(dis);
+							}							
 						}
 						// 视景姿态模拟运动
 						else
@@ -1083,7 +1089,7 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 void CECATSampleDlg::OnBnClickedBtnStopme()
 {
 	stopSCurve = true;
-	Sleep(1000); //等待DDA数据运动完毕
+	Sleep(2000); //等待DDA数据运动完毕
 	closeDataThread = true;
 	delta.ServoStop();
 	Sleep(100);
