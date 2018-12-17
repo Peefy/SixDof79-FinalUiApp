@@ -416,18 +416,22 @@ void SixdofControl()
 								dis[ii] = (int)pulse;
 							}
 							t += 0.00095;
-							if (stopSCurve == true)
+							if (stopSCurve == true && isCosMode == false)
 							{
 								auto maxHz = util::MaxValue(testHz, AXES_COUNT);
 								auto val = 2 * pi * maxHz * (nowt + 1);
 								auto rangeval = util::PutRadIn(val, 0, 2 * pi);
-								stopTime = nowt + (2.5 * pi - rangeval) / (2 * pi * maxHz);	
+								stopTime = nowt + (1.5 * pi - rangeval + 0.6) / (2 * pi * maxHz);	
 								stopSCurve = false;
 							}
-							if (stopTime == 0 || nowt < stopTime) 
+							if (stopTime == 0 || nowt <= stopTime) 
 							{
 								delta.SetDDAData(dis);
-							}							
+							}	
+							else if (nowt > stopTime)
+							{
+								t -= 0.00095;
+							}
 						}
 						// 视景姿态模拟运动
 						else
