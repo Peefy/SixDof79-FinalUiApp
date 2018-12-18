@@ -4,6 +4,7 @@
 #include "ECATSampleDlg.h"
 
 #include <math.h>
+#include <time.h>
 #include <fstream>
 #include <deque>
 
@@ -26,11 +27,14 @@
 #include "control/kalman_filter.h"
 #include "control/landvision.h"
 
+#include "config/recordpath.h"
+
 #include "ui/uiconfig.h"
 
+#include "util/mytime.h"
 #include "util/model.h"
 
-#include "register\register.h"
+#include "register/register.h"
 
 #include "Sixdofdll2010.h"
 
@@ -130,6 +134,8 @@ double controltime = 0;
 double dataChartTime = 0;
 
 double t = 0;
+
+char fileName[100] = "";
 
 bool isCsp = false;
 U16 Counter = 0;
@@ -311,7 +317,7 @@ void VisionDataDeal()
 void SixdofControl()
 {
 	VisionDataDeal();
-	if(closeDataThread == false)
+	if (closeDataThread == false)
 	{	
 		U16 upCount = DDA_UP_COUNT;
 		DWORD start_time = 0;
@@ -471,6 +477,8 @@ void SixdofControl()
 		Sleep(delay);
 		DWORD end_time = GetTickCount();
 		runTime = end_time - start_time;
+		config::RecordPath(fileName, data.X / 10.0, data.Y / 10.0, data.Z / 10.0, 
+			data.Roll / 100.0, data.Yaw / 100.0, data.Pitch / 100.0);
 	}
 }
 
@@ -1168,14 +1176,8 @@ void CECATSampleDlg::OnBnClickedBtnSingleDown()
 	delta.ServoSingleMove(index, -DIS_PER_R, 0);
 }
 
-void CECATSampleDlg::OnBnClickedButtonTest()
+void CECATSampleDlg::RunTestMode()
 {
-	if (status != SIXDOF_STATUS_READY)
-	{
-		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
-		return;
-	}
-	status = SIXDOF_STATUS_RUN;
 	//位移单位mm 角度单位 度
 	auto xval = RANGE(GetCEditNumber(IDC_EDIT_X_VAL), -MAX_XYZ, MAX_XYZ); 
 	auto yval = RANGE(GetCEditNumber(IDC_EDIT_Y_VAL), -MAX_XYZ, MAX_XYZ);
@@ -1244,8 +1246,26 @@ void CECATSampleDlg::OnBnClickedButtonTest()
 	isTest = true;
 	t = 0;
 	dataChartTime = 0;
+
+	int nYear, nMonth, nDay, nHour, nMinute, nSecond, nMilliseconds;
+	time_t currtime = time(NULL);
+	struct tm* p = gmtime(&currtime);
+	sprintf_s(fileName, "./datas/pathdata%d-%d-%d-%d-%d-%d.txt", p->tm_year + 1990, p->tm_mon + 1,
+		p->tm_mday, p->tm_hour + 8, p->tm_min, p->tm_sec);
+
 	closeDataThread = false;
 	isStart = true;
+}
+
+void CECATSampleDlg::OnBnClickedButtonTest()
+{
+	if (status != SIXDOF_STATUS_READY)
+	{
+		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
+		return;
+	}
+	status = SIXDOF_STATUS_RUN;
+	RunTestMode();
 }
 
 void CECATSampleDlg::OnBnClickedButtonExit()
@@ -1255,7 +1275,7 @@ void CECATSampleDlg::OnBnClickedButtonExit()
 
 void CECATSampleDlg::OnBnClickedButtonTest3()
 {
-	
+	RunTestMode();
 }
 
 void CECATSampleDlg::OnBnClickedButtonStopTest()

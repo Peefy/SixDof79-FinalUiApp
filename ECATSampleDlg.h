@@ -73,6 +73,7 @@ public:
 	void EanbleButton(int isenable);
 	void ChartInit();
 	void AppInit();
+	void RunTestMode();
 	double GetCEditNumber(int cEditId);
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedBtnConnect();
