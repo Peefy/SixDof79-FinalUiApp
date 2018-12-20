@@ -424,10 +424,17 @@ void SixdofControl()
 							t += 0.00095;
 							if (stopSCurve == true && isCosMode == false)
 							{
+								int index = 0;
 								auto maxHz = util::MaxValue(testHz, AXES_COUNT);
-								auto val = 2 * pi * maxHz * (nowt + 1);
-								auto rangeval = util::PutRadIn(val, 0, 2 * pi);
-								stopTime = nowt + (1.5 * pi - rangeval + 0.6) / (2 * pi * maxHz);	
+								for (int i = 0;i < 100;++i)
+								{
+									if (pi * i + 0.5 * pi >= nowt * 2 * pi * maxHz)
+									{
+										index = i;
+										break;
+									}
+								}
+								stopTime = (pi * index + 0.5 * pi) / (2 * pi * maxHz) + chirpTime - 1;
 								stopSCurve = false;
 							}
 							if (stopTime == 0 || nowt <= stopTime) 
