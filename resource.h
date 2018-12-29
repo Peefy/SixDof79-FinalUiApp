@@ -89,8 +89,14 @@
 #define IDC_EDIT_YAW_PHASE              1060
 #define IDC_FRM_STS                     1061
 #define IDC_STATIC_PLATFORM             1061
-#define IDC_STATIC_SWICH_STATUS         1062
 #define IDC_STATIC_SWITCH_STATUS        1062
+#define IDC_STATIC_POLE_LENGTH          1063
+#define IDC_STATIC_STATUS1              1064
+#define IDC_STATIC_STATUS2              1065
+#define IDC_STATIC_STATUS3              1066
+#define IDC_STATIC_STATUS4              1067
+#define IDC_STATIC_STATUS5              1068
+#define IDC_STATIC_STATUS6              1069
 #define IDC_BTN_PMove                   1077
 #define IDC_BTN_RALM                    1078
 #define IDC_BTN_MMove                   1079
@@ -116,7 +122,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        131
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1027
+#define _APS_NEXT_CONTROL_VALUE         1070
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

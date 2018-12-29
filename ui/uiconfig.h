@@ -64,5 +64,6 @@
 
 #define IDC_STATIC_PLATFORM_SHOW_TEXT        "六自由度平台状态"
 #define IDC_STATIC_SWITCH_STATUS_SHOW_TEXT   "接近开关"
+#define IDC_STATIC_POLE_LENGTH_SHOW_TEXT     "缸伸长量(mm)"
 
 #endif
