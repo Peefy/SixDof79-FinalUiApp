@@ -99,6 +99,10 @@ MovingAverageFilterType rollFiter = {64};
 MovingAverageFilterType yawFiter = {16};
 MovingAverageFilterType pitchFiter = {16};
 
+MovingAverageFilterType xFiter = {16};
+MovingAverageFilterType yFiter = {16};
+MovingAverageFilterType zFiter = {16};
+
 double controlOut[FREEDOM_NUM];
 
 CChartCtrl m_ChartCtrl1; 
@@ -461,9 +465,9 @@ void SixdofControl()
 							data.Yaw = (int16_t)(vision.Yaw * 100);
 							data.Pitch = (int16_t)(vision.Pitch * 100);
 							auto shockz = sin(2 * pi * shockHz * t) * shockVal;
-							auto x = RANGE(vision.X, -VISION_MAX_XYZ, VISION_MAX_XYZ);
-							auto y = RANGE(vision.Y, -VISION_MAX_XYZ, VISION_MAX_XYZ);
-							auto z = RANGE(vision.Z, -VISION_MAX_XYZ, VISION_MAX_XYZ);
+							auto x = RANGE(MyMAFilter(&xFiter, vision.X), -VISION_MAX_XYZ, VISION_MAX_XYZ);
+							auto y = RANGE(MyMAFilter(&yFiter, vision.Y), -VISION_MAX_XYZ, VISION_MAX_XYZ);
+							auto z = RANGE(MyMAFilter(&zFiter, vision.Z), -VISION_MAX_XYZ, VISION_MAX_XYZ);
 							auto roll = RANGE(MyMAFilter(&rollFiter, vision.Roll), -VISION_MAX_DEG, VISION_MAX_DEG);
 							auto pitch = RANGE(MyMAFilter(&pitchFiter, vision.Pitch), -VISION_MAX_DEG, VISION_MAX_DEG);
 							auto yaw = RANGE(MyMAFilter(&yawFiter, vision.Yaw), -VISION_MAX_DEG, VISION_MAX_DEG);
