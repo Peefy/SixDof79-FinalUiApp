@@ -720,6 +720,9 @@ void CECATSampleDlg::AppInit()
 	GetDlgItem(IDC_STATIC_TEST)->SetWindowTextW(_T(IDC_STATIC_TEST_SHOW_TEXT));
 	GetDlgItem(IDC_BUTTON_TEST)->SetWindowTextW(_T(IDC_BUTTON_TEST_SHOW_TEXT));
 
+	GetDlgItem(IDC_STATIC_PLATFORM)->SetWindowTextW(_T(IDC_STATIC_PLATFORM_SHOW_TEXT));
+	GetDlgItem(IDC_STATIC_SWITCH_STATUS)->SetWindowTextW(_T(IDC_STATIC_SWITCH_STATUS_SHOW_TEXT));
+
 	GetDlgItem(IDC_STATIC_APP_STATUS)->SetWindowTextW(_T(CORPORATION_NAME));
 	GetDlgItem(IDC_STATIC_APP_TITLE)->SetWindowTextW(_T(APP_TITLE));
 	CFont* font = new CFont();
@@ -867,9 +870,9 @@ BOOL CECATSampleDlg::SetWindowPixelFormat(HDC hDC)
 BOOL CECATSampleDlg::CreateViewGLContext(HDC hDC) 
 { 
 	hrenderRC = wglCreateContext(hDC); 
-	if(hrenderRC==NULL) 
+	if(hrenderRC == NULL) 
 		return FALSE; 
-	if(wglMakeCurrent(hDC,hrenderRC)==FALSE) 
+	if(wglMakeCurrent(hDC, hrenderRC) == FALSE) 
 		return FALSE; 
 	return TRUE; 
 } 

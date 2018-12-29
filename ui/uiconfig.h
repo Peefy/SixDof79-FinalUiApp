@@ -14,7 +14,7 @@
 
 #define IDC_STATIC_POSE_SHOW_TEXT      "姿态"
 #define IDC_STATIC_LENGTH_SHOW_TEXT    "缸长"
-#define IDC_STATIC_SENSOR_SHOW_TEXT    "传感器"
+#define IDC_STATIC_SENSOR_SHOW_TEXT    "车辆"
 
 #define IDC_STATIC_X_VAL_SHOW_TEXT     "纵向幅值"
 #define IDC_STATIC_Y_VAL_SHOW_TEXT     "横向幅值"
@@ -46,8 +46,8 @@
 #define APP_TITLE ""
 #define APP_TITLE_FONT_SIZE 240
 
-#define CHART_TITLE "位姿信息"
-#define CHART_LEFT_AXIS_TITLE "数值单位(mm, °)"
+#define CHART_TITLE             "位姿信息"
+#define CHART_LEFT_AXIS_TITLE   "数值单位(mm, °)"
 #define CHART_BOTTOM_AXIS_TITLE "时间(t/s)"
 
 #define INIT_FAIL_MESSAGE "初始化电机运动控制卡失败，检查连线！"
@@ -61,5 +61,8 @@
 #define SIXDOF_NOT_BOTTOM_AND_RISE_MESSAGE "所有缸不在底部，禁止上升"
 #define SIXDOF_NOT_MIDDLE_MESSAGE "缸没有处于静止，不能回中"
 #define SIXDOF_NOT_BEGIN_MESSAGE "缸没有处于静止，不能开始"
+
+#define IDC_STATIC_PLATFORM_SHOW_TEXT        "六自由度平台状态"
+#define IDC_STATIC_SWITCH_STATUS_SHOW_TEXT   "接近开关"
 
 #endif
