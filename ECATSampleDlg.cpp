@@ -96,6 +96,8 @@ SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
 MovingAverageFilterType rollFiter = {64};
+MovingAverageFilterType yawFiter = {16};
+MovingAverageFilterType pitchFiter = {64};
 
 double controlOut[FREEDOM_NUM];
 
@@ -463,8 +465,8 @@ void SixdofControl()
 							auto y = RANGE(vision.Y, -VISION_MAX_XYZ, VISION_MAX_XYZ);
 							auto z = RANGE(vision.Z, -VISION_MAX_XYZ, VISION_MAX_XYZ);
 							auto roll = RANGE(MyMAFilter(&rollFiter, vision.Roll), -VISION_MAX_DEG, VISION_MAX_DEG);
-							auto pitch = RANGE(vision.Pitch, -VISION_MAX_DEG, VISION_MAX_DEG);
-							auto yaw = RANGE(vision.Yaw, -VISION_MAX_DEG, VISION_MAX_DEG);
+							auto pitch = RANGE(MyMAFilter(&pitchFiter, vision.Pitch), -VISION_MAX_DEG, VISION_MAX_DEG);
+							auto yaw = RANGE(MyMAFilter(&yawFiter, vision.Yaw), -VISION_MAX_DEG, VISION_MAX_DEG);
 							z += (enableShock == true ? shockz : 0);
 							double* pulse_dugu = Control(x, y, z + shockz, roll, yaw, pitch);
 							for (auto ii = 0; ii < AXES_COUNT; ++ii)
