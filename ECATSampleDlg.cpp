@@ -426,7 +426,7 @@ void SixdofControl()
 							{
 								int index = 0;
 								auto maxHz = util::MaxValue(testHz, AXES_COUNT);
-								for (int i = 0;i < 100;++i)
+								for (int i = 0;i < 100; ++i)
 								{
 									if (pi * i + 0.5 * pi >= nowt * 2 * pi * maxHz)
 									{
@@ -476,7 +476,9 @@ void SixdofControl()
 							}
 							t += 0.01;
 							delta.Csp(dis);
-						}					
+						}
+						config::RecordPath(fileName, data.X / 10.0, data.Y / 10.0, data.Z / 10.0, 
+							data.Roll / 100.0, data.Yaw / 100.0, data.Pitch / 100.0);
 					}
 				}
 			}
@@ -484,8 +486,6 @@ void SixdofControl()
 		Sleep(delay);
 		DWORD end_time = GetTickCount();
 		runTime = end_time - start_time;
-		config::RecordPath(fileName, data.X / 10.0, data.Y / 10.0, data.Z / 10.0, 
-			data.Roll / 100.0, data.Yaw / 100.0, data.Pitch / 100.0);
 	}
 }
 
@@ -1101,6 +1101,13 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 	sin_time_pulse = 0;
 	t = 0;
 	dataChartTime = 0;
+
+	int nYear, nMonth, nDay, nHour, nMinute, nSecond, nMilliseconds;
+	time_t currtime = time(NULL);
+	struct tm* p = gmtime(&currtime);
+	sprintf_s(fileName, "./datas/pathdata%d-%d-%d-%d-%d-%d.txt", p->tm_year + 1990, p->tm_mon + 1,
+		p->tm_mday, p->tm_hour + 8, p->tm_min, p->tm_sec);
+
 	closeDataThread = false;
 	isStart = true;	
 }
