@@ -97,8 +97,15 @@
 #define IDC_STATIC_STATUS4              1067
 #define IDC_STATIC_STATUS5              1068
 #define IDC_STATIC_STATUS6              1069
+#define IDC_STATIC_PIC_POLE1            1070
+#define IDC_STATIC_PIC_POLE2            1071
+#define IDC_STATIC_PIC_POLE3            1072
+#define IDC_STATIC_PIC_POLE4            1073
+#define IDC_STATIC_PIC_POLE5            1074
 #define IDC_BTN_PMove                   1077
 #define IDC_BTN_RALM                    1078
+#define IDC_STATIC_PIC_POLE9            1078
+#define IDC_STATIC_PIC_POLE6            1078
 #define IDC_BTN_MMove                   1079
 #define IDC_BTN_MMove2                  1080
 #define IDC_BTN_Rise                    1080

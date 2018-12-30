@@ -41,6 +41,8 @@
 #include "glut.h"
 #include "opengl/sixdofopenglhelper.h"
 
+#include "cwnds/panel.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -49,8 +51,8 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace std;
 
-#define COLOR_RED   RGB(255, 123, 123)
-#define COLOR_GREEN RGB(123, 255, 123)
+#define COLOR_RED     RGB(255, 123, 123)
+#define COLOR_GREEN   RGB(123, 255, 123)
 
 #define TIMER_MS 10
 
@@ -90,10 +92,8 @@ I32 lastStartPulse[AXES_COUNT];
 double pulse_cal[AXES_COUNT];
 double poleLength[AXES_COUNT];
 
-SixDof sixdof;
 MotionControl delta;
 DataPackage data;
-DataPackage scenedata = {0};
 LandVision vision;
 
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
@@ -480,6 +480,7 @@ void SixdofControl()
 							double* pulse_dugu = Control(x, y, z + shockz, roll, yaw, pitch);
 							for (auto ii = 0; ii < AXES_COUNT; ++ii)
 							{
+								poleLength[ii] = pulse_dugu[ii];
 								pulse_cal[ii] = pulse_dugu[ii];
 								pulse_cal[ii] *= LENGTH_TO_PULSE_SCALE;
 								auto pulse = pulse_cal[ii];
@@ -921,6 +922,33 @@ void CECATSampleDlg::FillCtlColor(CWnd* cwnd, COLORREF color)
 	pDC->FillRect(&picrct, &brs);
 }
 
+void CECATSampleDlg::ShowSingleImage(int ctlId, float value)
+{
+	CRect rect;
+	CWnd* pic = GetDlgItem(ctlId); 
+	CDC* dc = pic->GetDC();   
+	GetDlgItem(ctlId)->GetClientRect(&rect);  
+	dc->SetMapMode(MM_ANISOTROPIC);
+	dc->SetWindowOrg(0, 0);
+	dc->SetWindowExt(rect.right, rect.bottom);
+	dc->SetViewportOrg(0, rect.bottom / 2);
+	dc->SetViewportExt(rect.right, - rect.bottom);
+
+	Gdiplus::Graphics g(pic->GetDC()->m_hDC);   
+	//g.Clear(Gdiplus::Color::Wheat);
+	g.DrawImage(GetPumpImage(0, MAX_POLE_LENGTH, value, _T("mm")), 0, 0, rect.Width(), rect.Height());
+}
+
+void CECATSampleDlg::ShowImage()
+{
+	ShowSingleImage(IDC_STATIC_PIC_POLE1, poleLength[0]);
+	ShowSingleImage(IDC_STATIC_PIC_POLE2, poleLength[1]);
+	ShowSingleImage(IDC_STATIC_PIC_POLE3, poleLength[2]);
+	ShowSingleImage(IDC_STATIC_PIC_POLE4, poleLength[3]);
+	ShowSingleImage(IDC_STATIC_PIC_POLE5, poleLength[4]);
+	ShowSingleImage(IDC_STATIC_PIC_POLE6, poleLength[5]);
+}
+
 void CECATSampleDlg::RenderSwitchStatus()
 {
 	delta.ReadAllSwitchStatus();
@@ -953,8 +981,8 @@ void CECATSampleDlg::OnPaint()
 	{
 		CDialog::OnPaint();
 	}
-	RenderSwitchStatus();
 	RenderScene();
+	ShowImage();
 }
 
 HCURSOR CECATSampleDlg::OnQueryDragIcon()
@@ -1011,13 +1039,14 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	}
 	MoveValPoint();
 	RenderScene();
+	RenderSwitchStatus();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
 		data.Yaw, data.Pitch, data.Roll, runTime, Counter);
 	SetDlgItemText(IDC_EDIT_Pose, statusStr);
 
 	statusStr.Format(_T("1:%.2f 2:%.2f 3:%.2f 4:%.2f 5:%.2f 6:%.2f"), 
-		sixdof.PoleLength[0], sixdof.PoleLength[1], sixdof.PoleLength[2],
-		sixdof.PoleLength[3], sixdof.PoleLength[4], sixdof.PoleLength[5]);
+		poleLength[0], poleLength[1], poleLength[2],
+		poleLength[3], poleLength[4], poleLength[5]);
 	SetDlgItemText(IDC_EDIT_Pulse, statusStr);
 
 	statusStr.Format(_T("1:%.2f 2:%.2f 3:%.2f 4:%.2f 5:%.2f 6:%.2f"),

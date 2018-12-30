@@ -28,6 +28,7 @@
 #define AXES_COUNT 6
 
 //电机到丝杠的导程 一圈大概是6mm, 缸最大伸长量为700mm
+#define MAX_POLE_LENGTH 700 / 2.0
 #define PULSE_PER_R 1280000
 #define MM_PER_R 6.00
 #define LENGTH_TO_PULSE_SCALE 213333.333333333

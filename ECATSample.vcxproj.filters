@@ -40,6 +40,9 @@
     <Filter Include="opengl">
       <UniqueIdentifier>{b27e079a-1b3d-421d-b0fd-af87df6e675d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cwnds">
+      <UniqueIdentifier>{5f8b1f5c-3488-4db8-aaec-6a50cef88c35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ECATSample.cpp">
@@ -188,6 +191,9 @@
     </ClCompile>
     <ClCompile Include="util\mytime.cpp">
       <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="cwnds\panel.cpp">
+      <Filter>cwnds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -429,6 +435,9 @@
     </ClInclude>
     <ClInclude Include="util\mytime.h">
       <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="cwnds\panel.h">
+      <Filter>cwnds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
