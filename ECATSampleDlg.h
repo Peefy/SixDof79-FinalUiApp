@@ -26,6 +26,7 @@ public:
 	//{{AFX_VIRTUAL(CECATSampleDlg)
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	//}}AFX_VIRTUAL
 
 // Implementation
@@ -60,6 +61,8 @@ public:
 	BOOL CreateViewGLContext(HDC hDC);     //View GL Context 
 	void RenderScene();                                //���Ƴ��� 
 	void VisionDataDeal();
+	void RenderSwitchStatus();
+	void FillCtlColor(CWnd* cwnd, COLORREF color);
 	HDC hrenderDC;      //DC 
 	HGLRC hrenderRC;  //RC  
 	int PixelFormat; 

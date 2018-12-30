@@ -49,6 +49,9 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace std;
 
+#define COLOR_RED   RGB(255, 123, 123)
+#define COLOR_GREEN RGB(123, 255, 123)
+
 #define TIMER_MS 10
 
 #define SIXDOF_CONTROL_DELEY     50
@@ -85,6 +88,7 @@ volatile HANDLE DataBufferThread;
 I32 pulse_test[AXES_COUNT];
 I32 lastStartPulse[AXES_COUNT];
 double pulse_cal[AXES_COUNT];
+double poleLength[AXES_COUNT];
 
 SixDof sixdof;
 MotionControl delta;
@@ -422,6 +426,7 @@ void SixdofControl()
 							double* pulse_dugu = Control(x, y, z, roll, yaw, pitch);
 							for (auto ii = 0; ii < AXES_COUNT; ++ii)
 							{
+								poleLength[ii] = pulse_dugu[ii];
 								pulse_cal[ii] = pulse_dugu[ii];
 								pulse_cal[ii] *= LENGTH_TO_PULSE_SCALE;
 								auto pulse = pulse_cal[ii];
@@ -542,6 +547,20 @@ CECATSampleDlg::CECATSampleDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CECATSampleDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON1);
+}
+
+HBRUSH CECATSampleDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = __super::OnCtlColor(pDC, pWnd, nCtlColor);
+	CBrush m_brush(RGB(244,247,252)); 
+	// TODO:  在此更改 DC 的任何属性
+	if (pWnd->GetDlgCtrlID()==IDC_STATIC_STATUS1) //Picture Control控件icon背景颜色设置
+	{
+		pDC->SetBkColor(RGB(244,247,252));
+		hbr = (HBRUSH)m_brush;
+	}
+	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
+	return hbr;
 }
 
 void CECATSampleDlg::DoDataExchange(CDataExchange* pDX)
@@ -722,7 +741,7 @@ void CECATSampleDlg::AppInit()
 
 	GetDlgItem(IDC_STATIC_PLATFORM)->SetWindowTextW(_T(IDC_STATIC_PLATFORM_SHOW_TEXT));
 	GetDlgItem(IDC_STATIC_SWITCH_STATUS)->SetWindowTextW(_T(IDC_STATIC_SWITCH_STATUS_SHOW_TEXT));
-	GetDlgItem(IDC_STATIC_POLE_LENGTH)->SetWindowTextW(_T(IDC_STATIC_SWITCH_STATUS_SHOW_TEXT));
+	GetDlgItem(IDC_STATIC_POLE_LENGTH)->SetWindowTextW(_T(IDC_STATIC_POLE_LENGTH_SHOW_TEXT));
 
 	GetDlgItem(IDC_STATIC_APP_STATUS)->SetWindowTextW(_T(CORPORATION_NAME));
 	GetDlgItem(IDC_STATIC_APP_TITLE)->SetWindowTextW(_T(APP_TITLE));
@@ -887,6 +906,32 @@ void CECATSampleDlg::RenderScene()
 	SwapBuffers(hrenderDC); 
 } 
 
+void CECATSampleDlg::FillCtlColor(CWnd* cwnd, COLORREF color)
+{
+	CDC *pDC = cwnd->GetDC();
+	CRect rct;
+	cwnd->GetWindowRect(&rct);
+	CBrush brs;
+	brs.CreateSolidBrush(color);
+	CRect picrct;
+	picrct.top = 0;
+	picrct.left = 0;
+	picrct.bottom = rct.Height();
+	picrct.right = rct.Width();
+	pDC->FillRect(&picrct, &brs);
+}
+
+void CECATSampleDlg::RenderSwitchStatus()
+{
+	delta.ReadAllSwitchStatus();
+	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS1), delta.IsAtBottoms[0] ? COLOR_GREEN : COLOR_RED);
+	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS2), delta.IsAtBottoms[1] ? COLOR_GREEN : COLOR_RED);
+	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS3), delta.IsAtBottoms[2] ? COLOR_GREEN : COLOR_RED);
+	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS4), delta.IsAtBottoms[3] ? COLOR_GREEN : COLOR_RED);
+	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS5), delta.IsAtBottoms[4] ? COLOR_GREEN : COLOR_RED);
+	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS6), delta.IsAtBottoms[5] ? COLOR_GREEN : COLOR_RED);
+}
+
 void CECATSampleDlg::OnPaint() 
 {
 	if (IsIconic())
@@ -908,6 +953,7 @@ void CECATSampleDlg::OnPaint()
 	{
 		CDialog::OnPaint();
 	}
+	RenderSwitchStatus();
 	RenderScene();
 }
 
