@@ -99,13 +99,13 @@ LandVision vision;
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
-MovingAverageFilterType rollFiter = {32};
-MovingAverageFilterType yawFiter = {8};
-MovingAverageFilterType pitchFiter = {8};
+MovingAverageFilterType rollFiter = {48};
+MovingAverageFilterType yawFiter = {12};
+MovingAverageFilterType pitchFiter = {12};
 
-MovingAverageFilterType xFiter = {8};
-MovingAverageFilterType yFiter = {8};
-MovingAverageFilterType zFiter = {8};
+MovingAverageFilterType xFiter = {12};
+MovingAverageFilterType yFiter = {12};
+MovingAverageFilterType zFiter = {12};
 
 double controlOut[FREEDOM_NUM];
 
