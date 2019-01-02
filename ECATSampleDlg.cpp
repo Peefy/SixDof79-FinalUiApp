@@ -489,8 +489,7 @@ void SixdofControl()
 							t += 0.01;
 							delta.Csp(dis);
 						}
-						config::RecordPath(fileName, data.X / 10.0, data.Y / 10.0, data.Z / 10.0, 
-							data.Roll / 100.0, data.Yaw / 100.0, data.Pitch / 100.0);
+
 					}
 				}
 			}
@@ -498,6 +497,8 @@ void SixdofControl()
 		Sleep(delay);
 		DWORD end_time = GetTickCount();
 		runTime = end_time - start_time;
+		config::RecordPath(fileName, data.X / 10.0, data.Y / 10.0, data.Z / 10.0, 
+			data.Roll / 100.0, data.Yaw / 100.0, data.Pitch / 100.0);
 	}
 }
 
