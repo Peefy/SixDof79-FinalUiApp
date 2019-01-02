@@ -68,7 +68,7 @@ using namespace std;
 #define ENABLE_CHIRP  true
 #define ENABLE_SHOCK  true
 
-double ShockVal = 0.03;
+double ShockVal = 0.1;
 double ShockHz = 8.0;
 bool enableShock = ENABLE_SHOCK;
 bool enableChirp = ENABLE_CHIRP;
@@ -1188,7 +1188,6 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 	t = 0;
 	dataChartTime = 0;
 
-	int nYear, nMonth, nDay, nHour, nMinute, nSecond, nMilliseconds;
 	time_t currtime = time(NULL);
 	struct tm* p = gmtime(&currtime);
 	sprintf_s(fileName, "./datas/pathdata%d-%d-%d-%d-%d-%d.txt", p->tm_year + 1990, p->tm_mon + 1,
@@ -1347,7 +1346,6 @@ void CECATSampleDlg::RunTestMode()
 	t = 0;
 	dataChartTime = 0;
 
-	int nYear, nMonth, nDay, nHour, nMinute, nSecond, nMilliseconds;
 	time_t currtime = time(NULL);
 	struct tm* p = gmtime(&currtime);
 	sprintf_s(fileName, "./datas/pathdata%d-%d-%d-%d-%d-%d.txt", p->tm_year + 1990, p->tm_mon + 1,
