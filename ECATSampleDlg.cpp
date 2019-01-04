@@ -1040,7 +1040,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	}
 	MoveValPoint();
 	RenderScene();
-	RenderSwitchStatus();
+	//RenderSwitchStatus();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
 		data.Yaw, data.Pitch, data.Roll, runTime, Counter);
 	SetDlgItemText(IDC_EDIT_Pose, statusStr);
