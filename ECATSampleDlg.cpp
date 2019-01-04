@@ -1227,6 +1227,11 @@ void CECATSampleDlg::OnBnClickedBtnDown()
 	{
 		return;
 	}
+	if (status != SIXDOF_STATUS_READY)
+	{
+		MessageBox(_T(SIXDOF_NOT_FALLING_MESSAGE));
+		return;
+	}
 	delta.ServoStop();
 	Sleep(100);
 	status = SIXDOF_STATUS_ISFALLING;
