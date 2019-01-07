@@ -926,28 +926,7 @@ void CECATSampleDlg::FillCtlColor(CWnd* cwnd, COLORREF color)
 	cwnd->ReleaseDC(pDC);
 }
 
-//	张开的弧度
-float radian=60;
-//	同心圆半径
-int radius[]=
-{
-	200,
-	120,
-	80
-};
 
-double fMax = 170;
-double fMin = 0;
-
-int nWidth = 200, nHeight = 100;
-int nShortScal = 10;
-double ptCenterX = nWidth/2.0;
-double ptCenterY = nHeight+20;
-double f0;
-double p0X;
-double p0Y;
-double p1X;
-double p1Y;
 
 void CECATSampleDlg::ShowSingleInitImage(int ctlId)
 {
@@ -956,6 +935,15 @@ void CECATSampleDlg::ShowSingleInitImage(int ctlId)
 	Gdiplus::Graphics g(GetDlgItem(ctlId)->GetDC()->m_hDC);   
 	g.Clear(Gdiplus::Color::White);
 	g.DrawImage(GetPumpImage(0, _T("mm")), 0, 0, rect.Width(), rect.Height());
+}
+
+void CECATSampleDlg::ShowSingleInitImage(CWnd* pic, float value)
+{
+	CRect rect; 
+	pic->GetClientRect(&rect);
+	Gdiplus::Graphics g(pic->GetDC()->m_hDC);   
+	g.Clear(Gdiplus::Color::White);
+	g.DrawImage(GetPumpImage(value, _T("mm")), 0, 0, rect.Width(), rect.Height());
 }
 
 void CECATSampleDlg::ShowInitImage()
@@ -968,17 +956,41 @@ void CECATSampleDlg::ShowInitImage()
 	ShowSingleInitImage(IDC_STATIC_PIC_POLE6);
 }
 
-CPen pen(PS_SOLID, 1, RGB(0, 0, 0));
+CPen drawLinePen(PS_SOLID, 2, RGB(0, 0, 0));
+CPen clearLinePen(PS_SOLID, 10, RGB(244, 244, 244));
+CBrush clearBrush(RGB(244, 244, 244));
+double ptCenterX = 52;
+double ptCenterY = 52;
+double f0;
+double p0X;
+double p0Y;
+double p1X;
+double p1Y;
+//	张开的弧度
+float radian=60;
+//	同心圆半径
+int radius[]=
+{
+	50,
+	24,
+	1
+};
+
+double fMax = 100;
+double fMin = -100;
 
 void CECATSampleDlg::ShowSingleImage(CWnd* pic, float value)
 {
+	value *= 2;
 	CDC* dc = pic->GetDC();   
 	f0 = ((180-radian)/2+radian/(fMax-fMin)*(-value + fMax)) / 180 * PI;
+	dc->SelectObject(&clearBrush);
+	dc->FillSolidRect(2,28,100,32, RGB(255, 255, 255));
 	p0X = ptCenterX+(radius[2]*cos(f0));
 	p0Y = ptCenterY-(radius[2]*sin(f0));
 	p1X = ptCenterX+((radius[1])*cos(f0));
 	p1Y = ptCenterY-((radius[1])*sin(f0));
-	dc->SelectObject(&pen);
+	dc->SelectObject(&drawLinePen);
 	dc->MoveTo(p0X, p0Y);
 	dc->LineTo(p1X, p1Y);
 	pic->ReleaseDC(dc);
@@ -996,6 +1008,7 @@ void CECATSampleDlg::ShowImage()
 
 void CECATSampleDlg::RenderSwitchStatus()
 {
+	delta.ReadAllSwitchStatus();
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS1), delta.IsAtBottoms[0] ? COLOR_GREEN : COLOR_RED);
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS2), delta.IsAtBottoms[1] ? COLOR_GREEN : COLOR_RED);
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS3), delta.IsAtBottoms[2] ? COLOR_GREEN : COLOR_RED);

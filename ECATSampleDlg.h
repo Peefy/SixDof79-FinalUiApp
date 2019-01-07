@@ -57,13 +57,14 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
-	BOOL SetWindowPixelFormat(HDC hDC);   //�趨���ظ�ʽ 
-	BOOL CreateViewGLContext(HDC hDC);     //View GL Context 
-	void RenderScene();                                //���Ƴ��� 
+	BOOL SetWindowPixelFormat(HDC hDC);   
+	BOOL CreateViewGLContext(HDC hDC);     
+	void RenderScene();                               
 	void VisionDataDeal();
 	void RenderSwitchStatus();
 	void FillCtlColor(CWnd* cwnd, COLORREF color);
 	void ShowSingleInitImage(int ctlId);
+	void ShowSingleInitImage(CWnd* pic, float value);
 	void ShowInitImage();
 	void ShowImage();
 	void ShowSingleImage(CWnd* cwnd, float value);

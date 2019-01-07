@@ -1,14 +1,15 @@
 
 #include "stdafx.h"
 #include "panel.h"
+#include <math.h>
 
 using namespace Gdiplus;
 
 #define FONT_WIDTH_SIZE  100
 #define FONT_HEIGHT_SIZE 30
 
- float fMin = 0;
- float fMax = 170;
+ float fMin = -100;
+ float fMax = 100;
 
 Gdiplus::Bitmap* GetPumpImage(float fValue, CString strUnit )
 {
@@ -53,7 +54,7 @@ Gdiplus::Bitmap* GetPumpImage(float fValue, CString strUnit )
 	Gdiplus::Color bkColor=Gdiplus::Color::SkyBlue;
 	//	刻度字体,大小,颜色
 	Gdiplus::Color ScaleColor=Gdiplus::Color::Blue;
-	Gdiplus::REAL	ScaleSize=16;
+	Gdiplus::REAL	ScaleSize=18;
 	CString ScaleFont=_T("Times New Roman");
 
 	Gdiplus::Bitmap *pImage = new Gdiplus::Bitmap(nWidth,nHeight);
@@ -131,6 +132,7 @@ Gdiplus::Bitmap* GetPumpImage(float fValue, CString strUnit )
 	Gdiplus::Color DataColor=Gdiplus::Color::Red;
 
 	//	单位
+	/*
 	Gdiplus::RectF UnitRc;
 	CSize size = CSize(FONT_WIDTH_SIZE, FONT_HEIGHT_SIZE); //CGraphCurveView::GetOutPutTextSize(pGraph,strUnit,strDataFont,DataSize);
 	UnitRc.X=ptCenter.X-size.cx/2;
@@ -145,8 +147,9 @@ Gdiplus::Bitmap* GetPumpImage(float fValue, CString strUnit )
 		&format,
 		&Gdiplus::SolidBrush(DataColor)
 		);
-
+	*/
 	//	数据
+	/*
 	CString strData;
 	strData.Format(_T("%.1f"),fValue);
 	size= CSize(FONT_WIDTH_SIZE, FONT_HEIGHT_SIZE);//CGraphCurveView::GetOutPutTextSize(pGraph,strData,strDataFont,DataSize);
@@ -163,17 +166,18 @@ Gdiplus::Bitmap* GetPumpImage(float fValue, CString strUnit )
 		&format,
 		&Gdiplus::SolidBrush(DataColor)
 		);
-
+	*/
 	//	画指针
-// 	Gdiplus::Pen PointPen(Gdiplus::Color::Green,2);
-// 	Gdiplus::Point p0,p1;
-// 	double f0=((180-fRadian)/2+fRadian/(fMax-fMin)*(-fValue+fMax))/180*PI;
-// 	p0.X=ptCenter.X+(nRadius[2]*cos(f0));
-// 	p0.Y=ptCenter.Y-(nRadius[2]*sin(f0));
-// 	p1.X=ptCenter.X+((nRadius[1]+nShortScal/2)*cos(f0));
-// 	p1.Y=ptCenter.Y-((nRadius[1]+nShortScal/2)*sin(f0));
-// 	pGraph->DrawLine(&PointPen,p0,p1);
-
+	/*
+	Gdiplus::Pen PointPen(Gdiplus::Color::Green,2);
+	Gdiplus::Point p0,p1;
+	double f0=((180-fRadian)/2+fRadian/(fMax-fMin)*(-fValue+fMax))/180*PI;
+	p0.X=ptCenter.X+(nRadius[2]*cos(f0));
+	p0.Y=ptCenter.Y-(nRadius[2]*sin(f0));
+	p1.X=ptCenter.X+((nRadius[1]+nShortScal/2)*cos(f0));
+	p1.Y=ptCenter.Y-((nRadius[1]+nShortScal/2)*sin(f0));
+	pGraph->DrawLine(&PointPen,p0,p1);
+	*/
 	delete pGraph;
 	return pImage;
 
