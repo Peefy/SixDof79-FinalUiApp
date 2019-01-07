@@ -91,6 +91,7 @@ I32 pulse_test[AXES_COUNT];
 I32 lastStartPulse[AXES_COUNT];
 double pulse_cal[AXES_COUNT];
 double poleLength[AXES_COUNT];
+int poleLengthRenderCount = 0;
 
 MotionControl delta;
 DataPackage data;
@@ -100,12 +101,12 @@ SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
 MovingAverageFilterType rollFiter = {48};
-MovingAverageFilterType yawFiter = {12};
-MovingAverageFilterType pitchFiter = {12};
+MovingAverageFilterType yawFiter = {0};
+MovingAverageFilterType pitchFiter = {4};
 
-MovingAverageFilterType xFiter = {12};
-MovingAverageFilterType yFiter = {12};
-MovingAverageFilterType zFiter = {12};
+MovingAverageFilterType xFiter = {0};
+MovingAverageFilterType yFiter = {0};
+MovingAverageFilterType zFiter = {0};
 
 double controlOut[FREEDOM_NUM];
 
@@ -910,7 +911,7 @@ void CECATSampleDlg::RenderScene()
 
 void CECATSampleDlg::FillCtlColor(CWnd* cwnd, COLORREF color)
 {
-	CDC *pDC = cwnd->GetDC();
+	CDC * pDC = cwnd->GetDC();
 	CRect rct;
 	cwnd->GetWindowRect(&rct);
 	CBrush brs;
@@ -921,23 +922,65 @@ void CECATSampleDlg::FillCtlColor(CWnd* cwnd, COLORREF color)
 	picrct.bottom = rct.Height();
 	picrct.right = rct.Width();
 	pDC->FillRect(&picrct, &brs);
+	pDC->ReleaseAttribDC();
+	cwnd->ReleaseDC(pDC);
+}
+
+//	张开的弧度
+float radian=60;
+//	同心圆半径
+int radius[]=
+{
+	200,
+	120,
+	80
+};
+
+double fMax = 170;
+double fMin = 0;
+
+int nWidth = 200, nHeight = 100;
+int nShortScal = 10;
+double ptCenterX = nWidth/2.0;
+double ptCenterY = nHeight+20;
+double f0;
+double p0X;
+double p0Y;
+double p1X;
+double p1Y;
+
+void CECATSampleDlg::ShowSingleInitImage(int ctlId)
+{
+	CWnd* pic = GetDlgItem(ctlId); 
+	CRect rect; 
+	pic->GetClientRect(&rect);
+	Gdiplus::Graphics g(pic->GetDC()->m_hDC);   
+	g.Clear(Gdiplus::Color::White);
+	g.DrawImage(GetPumpImage(0, _T("mm")), 0, 0, rect.Width(), rect.Height());
+}
+
+void CECATSampleDlg::ShowInitImage()
+{
+	ShowSingleInitImage(IDC_STATIC_PIC_POLE1);
+	ShowSingleInitImage(IDC_STATIC_PIC_POLE2);
+	ShowSingleInitImage(IDC_STATIC_PIC_POLE3);
+	ShowSingleInitImage(IDC_STATIC_PIC_POLE4);
+	ShowSingleInitImage(IDC_STATIC_PIC_POLE5);
+	ShowSingleInitImage(IDC_STATIC_PIC_POLE6);
 }
 
 void CECATSampleDlg::ShowSingleImage(int ctlId, float value)
 {
-	CRect rect;
 	CWnd* pic = GetDlgItem(ctlId); 
 	CDC* dc = pic->GetDC();   
-	GetDlgItem(ctlId)->GetClientRect(&rect);  
-	dc->SetMapMode(MM_ANISOTROPIC);
-	dc->SetWindowOrg(0, 0);
-	dc->SetWindowExt(rect.right, rect.bottom);
-	dc->SetViewportOrg(0, rect.bottom / 2);
-	dc->SetViewportExt(rect.right, - rect.bottom);
-
-	Gdiplus::Graphics g(pic->GetDC()->m_hDC);   
-	//g.Clear(Gdiplus::Color::Wheat);
-	g.DrawImage(GetPumpImage(0, MAX_POLE_LENGTH, value, _T("mm")), 0, 0, rect.Width(), rect.Height());
+	f0 = ((180-radian)/2+radian/(fMax-fMin)*(-value + fMax)) / 180 * PI;
+	p0X = ptCenterX+(radius[2]*cos(f0));
+	p0Y = ptCenterY-(radius[2]*sin(f0));
+	p1X = ptCenterX+((radius[1])*cos(f0));
+	p1Y = ptCenterY-((radius[1])*sin(f0));
+	dc->SelectObject(new CPen(PS_SOLID, 1, RGB(0, 0, 0)));
+	dc->MoveTo(p0X, p0Y);
+	dc->LineTo(p1X, p1Y);
 }
 
 void CECATSampleDlg::ShowImage()
@@ -952,7 +995,6 @@ void CECATSampleDlg::ShowImage()
 
 void CECATSampleDlg::RenderSwitchStatus()
 {
-	delta.ReadAllSwitchStatus();
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS1), delta.IsAtBottoms[0] ? COLOR_GREEN : COLOR_RED);
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS2), delta.IsAtBottoms[1] ? COLOR_GREEN : COLOR_RED);
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS3), delta.IsAtBottoms[2] ? COLOR_GREEN : COLOR_RED);
@@ -983,7 +1025,7 @@ void CECATSampleDlg::OnPaint()
 		CDialog::OnPaint();
 	}
 	RenderScene();
-	ShowImage();
+	ShowInitImage();
 }
 
 HCURSOR CECATSampleDlg::OnQueryDragIcon()
@@ -1040,7 +1082,8 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	}
 	MoveValPoint();
 	RenderScene();
-	//RenderSwitchStatus();
+	RenderSwitchStatus();
+	//ShowImage();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
 		data.Yaw, data.Pitch, data.Roll, runTime, Counter);
 	SetDlgItemText(IDC_EDIT_Pose, statusStr);
@@ -1118,7 +1161,7 @@ void CECATSampleDlg::OnOK()
 
 void CECATSampleDlg::OnChkAbs() 
 {
-	CButton *lpBtnPtr = (CButton *)GetDlgItem(IDC_CHK_ABS);
+	
 }
 
 void CECATSampleDlg::OnBnClickedBtnRise()
@@ -1195,6 +1238,7 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 
 	closeDataThread = false;
 	isStart = true;	
+	delete p;
 }
 
 void CECATSampleDlg::OnBnClickedBtnStopme()

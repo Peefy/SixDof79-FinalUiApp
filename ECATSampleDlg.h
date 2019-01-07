@@ -63,6 +63,8 @@ public:
 	void VisionDataDeal();
 	void RenderSwitchStatus();
 	void FillCtlColor(CWnd* cwnd, COLORREF color);
+	void ShowSingleInitImage(int ctlId);
+	void ShowInitImage();
 	void ShowImage();
 	void ShowSingleImage(int ctlId, float value);
 	HDC hrenderDC;      //DC 

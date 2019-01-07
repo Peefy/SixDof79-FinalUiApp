@@ -7,7 +7,10 @@ using namespace Gdiplus;
 #define FONT_WIDTH_SIZE  100
 #define FONT_HEIGHT_SIZE 30
 
-Gdiplus::Bitmap* GetPumpImage( float fMin,float fMax,float fValue, CString strUnit )
+ float fMin = 0;
+ float fMax = 170;
+
+Gdiplus::Bitmap* GetPumpImage(float fValue, CString strUnit )
 {
 	const float PI = 3.141592653;
 	if(fMin>fValue)
@@ -145,7 +148,7 @@ Gdiplus::Bitmap* GetPumpImage( float fMin,float fMax,float fValue, CString strUn
 
 	//	Êý¾Ý
 	CString strData;
-	strData.Format(_T("%.0f"),fValue);
+	strData.Format(_T("%.1f"),fValue);
 	size= CSize(FONT_WIDTH_SIZE, FONT_HEIGHT_SIZE);//CGraphCurveView::GetOutPutTextSize(pGraph,strData,strDataFont,DataSize);
 	Gdiplus::RectF DataRc;
 	DataRc.X=ptCenter.X-size.cx/2;
@@ -162,14 +165,14 @@ Gdiplus::Bitmap* GetPumpImage( float fMin,float fMax,float fValue, CString strUn
 		);
 
 	//	»­Ö¸Õë
-	Gdiplus::Pen PointPen(Gdiplus::Color::Green,2);
-	Gdiplus::Point p0,p1;
-	double f0=((180-fRadian)/2+fRadian/(fMax-fMin)*(-fValue+fMax))/180*PI;
-	p0.X=ptCenter.X+(nRadius[2]*cos(f0));
-	p0.Y=ptCenter.Y-(nRadius[2]*sin(f0));
-	p1.X=ptCenter.X+((nRadius[1]+nShortScal/2)*cos(f0));
-	p1.Y=ptCenter.Y-((nRadius[1]+nShortScal/2)*sin(f0));
-	pGraph->DrawLine(&PointPen,p0,p1);
+// 	Gdiplus::Pen PointPen(Gdiplus::Color::Green,2);
+// 	Gdiplus::Point p0,p1;
+// 	double f0=((180-fRadian)/2+fRadian/(fMax-fMin)*(-fValue+fMax))/180*PI;
+// 	p0.X=ptCenter.X+(nRadius[2]*cos(f0));
+// 	p0.Y=ptCenter.Y-(nRadius[2]*sin(f0));
+// 	p1.X=ptCenter.X+((nRadius[1]+nShortScal/2)*cos(f0));
+// 	p1.Y=ptCenter.Y-((nRadius[1]+nShortScal/2)*sin(f0));
+// 	pGraph->DrawLine(&PointPen,p0,p1);
 
 	delete pGraph;
 	return pImage;
