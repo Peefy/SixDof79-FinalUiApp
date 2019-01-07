@@ -66,7 +66,7 @@ public:
 	void ShowSingleInitImage(int ctlId);
 	void ShowInitImage();
 	void ShowImage();
-	void ShowSingleImage(int ctlId, float value);
+	void ShowSingleImage(CWnd* cwnd, float value);
 	HDC hrenderDC;      //DC 
 	HGLRC hrenderRC;  //RC  
 	int PixelFormat; 

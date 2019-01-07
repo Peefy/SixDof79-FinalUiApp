@@ -951,10 +951,9 @@ double p1Y;
 
 void CECATSampleDlg::ShowSingleInitImage(int ctlId)
 {
-	CWnd* pic = GetDlgItem(ctlId); 
 	CRect rect; 
-	pic->GetClientRect(&rect);
-	Gdiplus::Graphics g(pic->GetDC()->m_hDC);   
+	GetDlgItem(ctlId)->GetClientRect(&rect);
+	Gdiplus::Graphics g(GetDlgItem(ctlId)->GetDC()->m_hDC);   
 	g.Clear(Gdiplus::Color::White);
 	g.DrawImage(GetPumpImage(0, _T("mm")), 0, 0, rect.Width(), rect.Height());
 }
@@ -969,28 +968,30 @@ void CECATSampleDlg::ShowInitImage()
 	ShowSingleInitImage(IDC_STATIC_PIC_POLE6);
 }
 
-void CECATSampleDlg::ShowSingleImage(int ctlId, float value)
+CPen pen(PS_SOLID, 1, RGB(0, 0, 0));
+
+void CECATSampleDlg::ShowSingleImage(CWnd* pic, float value)
 {
-	CWnd* pic = GetDlgItem(ctlId); 
 	CDC* dc = pic->GetDC();   
 	f0 = ((180-radian)/2+radian/(fMax-fMin)*(-value + fMax)) / 180 * PI;
 	p0X = ptCenterX+(radius[2]*cos(f0));
 	p0Y = ptCenterY-(radius[2]*sin(f0));
 	p1X = ptCenterX+((radius[1])*cos(f0));
 	p1Y = ptCenterY-((radius[1])*sin(f0));
-	dc->SelectObject(new CPen(PS_SOLID, 1, RGB(0, 0, 0)));
+	dc->SelectObject(&pen);
 	dc->MoveTo(p0X, p0Y);
 	dc->LineTo(p1X, p1Y);
+	pic->ReleaseDC(dc);
 }
 
 void CECATSampleDlg::ShowImage()
 {
-	ShowSingleImage(IDC_STATIC_PIC_POLE1, poleLength[0]);
-	ShowSingleImage(IDC_STATIC_PIC_POLE2, poleLength[1]);
-	ShowSingleImage(IDC_STATIC_PIC_POLE3, poleLength[2]);
-	ShowSingleImage(IDC_STATIC_PIC_POLE4, poleLength[3]);
-	ShowSingleImage(IDC_STATIC_PIC_POLE5, poleLength[4]);
-	ShowSingleImage(IDC_STATIC_PIC_POLE6, poleLength[5]);
+	ShowSingleImage(GetDlgItem(IDC_STATIC_PIC_POLE1), poleLength[0]);
+	ShowSingleImage(GetDlgItem(IDC_STATIC_PIC_POLE2), poleLength[1]);
+	ShowSingleImage(GetDlgItem(IDC_STATIC_PIC_POLE3), poleLength[2]);
+	ShowSingleImage(GetDlgItem(IDC_STATIC_PIC_POLE4), poleLength[3]);
+	ShowSingleImage(GetDlgItem(IDC_STATIC_PIC_POLE5), poleLength[4]);
+	ShowSingleImage(GetDlgItem(IDC_STATIC_PIC_POLE6), poleLength[5]);
 }
 
 void CECATSampleDlg::RenderSwitchStatus()
@@ -1058,15 +1059,15 @@ void CECATSampleDlg::OnBTNFindSlave()
 
 void CECATSampleDlg::EanbleButton(int isenable)
 {	
-	((CButton*) GetDlgItem(IDC_CHK_SVON))->EnableWindow(isenable);
-	((CButton*) GetDlgItem(IDC_BTN_Rise))->EnableWindow(isenable);
-	((CButton*) GetDlgItem(IDC_BTN_Middle))->EnableWindow(isenable);
-	((CButton*) GetDlgItem(IDC_BTN_Start))->EnableWindow(isenable);
-	((CButton*) GetDlgItem(IDC_BTN_StopMe))->EnableWindow(isenable);
-	((CButton*) GetDlgItem(IDC_BTN_Down))->EnableWindow(isenable);
-	((CButton*) GetDlgItem(IDC_BTN_Resetme))->EnableWindow(isenable);
-	((CButton*) GetDlgItem(IDC_BUTTON_TEST))->EnableWindow(isenable);
-	((CButton*) GetDlgItem(IDC_BUTTON_STOP_TEST))->EnableWindow(isenable);
+	GetDlgItem(IDC_CHK_SVON)->EnableWindow(isenable);
+	GetDlgItem(IDC_BTN_Rise)->EnableWindow(isenable);
+	GetDlgItem(IDC_BTN_Middle)->EnableWindow(isenable);
+	GetDlgItem(IDC_BTN_Start)->EnableWindow(isenable);
+	GetDlgItem(IDC_BTN_StopMe)->EnableWindow(isenable);
+	GetDlgItem(IDC_BTN_Down)->EnableWindow(isenable);
+	GetDlgItem(IDC_BTN_Resetme)->EnableWindow(isenable);
+	GetDlgItem(IDC_BUTTON_TEST)->EnableWindow(isenable);
+	GetDlgItem(IDC_BUTTON_STOP_TEST)->EnableWindow(isenable);
 }
 
 void CECATSampleDlg::OnTimer(UINT nIDEvent) 
@@ -1083,7 +1084,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	MoveValPoint();
 	RenderScene();
 	RenderSwitchStatus();
-	//ShowImage();
+	ShowImage();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
 		data.Yaw, data.Pitch, data.Roll, runTime, Counter);
 	SetDlgItemText(IDC_EDIT_Pose, statusStr);
