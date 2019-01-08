@@ -101,12 +101,12 @@ SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
 MovingAverageFilterType rollFiter = {48};
-MovingAverageFilterType yawFiter = {0};
+MovingAverageFilterType yawFiter = {1};
 MovingAverageFilterType pitchFiter = {4};
 
-MovingAverageFilterType xFiter = {0};
-MovingAverageFilterType yFiter = {0};
-MovingAverageFilterType zFiter = {0};
+MovingAverageFilterType xFiter = {2};
+MovingAverageFilterType yFiter = {2};
+MovingAverageFilterType zFiter = {2};
 
 double controlOut[FREEDOM_NUM];
 
@@ -1097,7 +1097,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	MoveValPoint();
 	RenderScene();
 	RenderSwitchStatus();
-	ShowImage();
+	//ShowImage();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
 		data.Yaw, data.Pitch, data.Roll, runTime, Counter);
 	SetDlgItemText(IDC_EDIT_Pose, statusStr);
