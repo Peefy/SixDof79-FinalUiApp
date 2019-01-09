@@ -102,7 +102,7 @@ SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
 MovingAverageFilterType rollFiter = {48};
 MovingAverageFilterType yawFiter = {1};
-MovingAverageFilterType pitchFiter = {4};
+MovingAverageFilterType pitchFiter = {12};
 
 MovingAverageFilterType xFiter = {2};
 MovingAverageFilterType yFiter = {2};
