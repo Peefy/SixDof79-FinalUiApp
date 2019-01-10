@@ -167,6 +167,7 @@
     <ClCompile Include="config\inihelper.cpp" />
     <ClCompile Include="config\recordpath.cpp" />
     <ClCompile Include="control\Com.cpp" />
+    <ClCompile Include="control\illusion.cpp" />
     <ClCompile Include="control\JY901.cpp" />
     <ClCompile Include="control\kalman_filter.cpp" />
     <ClCompile Include="control\landvision.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="config\inihelper.h" />
     <ClInclude Include="config\recordpath.h" />
     <ClInclude Include="control\Com.h" />
+    <ClInclude Include="control\illusion.h" />
     <ClInclude Include="control\JY901.h" />
     <ClInclude Include="control\kalman_filter.h" />
     <ClInclude Include="control\landvision.h" />
