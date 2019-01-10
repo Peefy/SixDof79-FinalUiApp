@@ -926,8 +926,6 @@ void CECATSampleDlg::FillCtlColor(CWnd* cwnd, COLORREF color)
 	cwnd->ReleaseDC(pDC);
 }
 
-
-
 void CECATSampleDlg::ShowSingleInitImage(int ctlId)
 {
 	CRect rect; 
@@ -1008,7 +1006,6 @@ void CECATSampleDlg::ShowImage()
 
 void CECATSampleDlg::RenderSwitchStatus()
 {
-	delta.ReadAllSwitchStatus();
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS1), delta.IsAtBottoms[0] ? COLOR_GREEN : COLOR_RED);
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS2), delta.IsAtBottoms[1] ? COLOR_GREEN : COLOR_RED);
 	FillCtlColor(GetDlgItem(IDC_STATIC_STATUS3), delta.IsAtBottoms[2] ? COLOR_GREEN : COLOR_RED);
