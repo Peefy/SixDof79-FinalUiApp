@@ -316,7 +316,7 @@ void VisionDataDeal()
 			ResetDefaultData(&data);
 		}
 	}
-	enableShock = vision.GetIsShock();
+	//enableShock = vision.GetIsShock();
 	ShockHz = vision.GetShockHzFromRoadType();
 	ShockVal = vision.GetShockValFromRoadType();
 	if (vision.RecieveState.GetFunction(7) == true)
@@ -498,8 +498,8 @@ void SixdofControl()
 		Sleep(delay);
 		DWORD end_time = GetTickCount();
 		runTime = end_time - start_time;
-		config::RecordPath(fileName, data.X / 10.0, data.Y / 10.0, data.Z / 10.0, 
-			data.Roll / 100.0, data.Yaw / 100.0, data.Pitch / 100.0);
+		//config::RecordPath(fileName, data.X / 10.0, data.Y / 10.0, data.Z / 10.0, 
+		//	data.Roll / 100.0, data.Yaw / 100.0, data.Pitch / 100.0);
 	}
 }
 
