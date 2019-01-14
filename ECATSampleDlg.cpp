@@ -102,7 +102,7 @@ SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
 MovingAverageFilterType rollFiter = {48};
 MovingAverageFilterType yawFiter = {1};
-MovingAverageFilterType pitchFiter = {6};
+MovingAverageFilterType pitchFiter = {5};
 
 MovingAverageFilterType xFiter = {2};
 MovingAverageFilterType yFiter = {2};
@@ -316,7 +316,7 @@ void VisionDataDeal()
 			ResetDefaultData(&data);
 		}
 	}
-	//enableShock = vision.GetIsShock();
+	enableShock = vision.GetIsShock();
 	ShockHz = vision.GetShockHzFromRoadType();
 	ShockVal = vision.GetShockValFromRoadType();
 	if (vision.RecieveState.GetFunction(7) == true)
@@ -1093,7 +1093,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	}
 	MoveValPoint();
 	RenderScene();
-	RenderSwitchStatus();
+	//RenderSwitchStatus();
 	//ShowImage();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
 		data.Yaw, data.Pitch, data.Roll, runTime, Counter);
