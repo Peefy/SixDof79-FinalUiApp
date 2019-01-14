@@ -68,7 +68,7 @@ using namespace std;
 #define ENABLE_CHIRP  true
 #define ENABLE_SHOCK  true
 
-double ShockVal = 1;
+double ShockVal = 0.1;
 double ShockHz = 8.0;
 bool enableShock = ENABLE_SHOCK;
 bool enableChirp = ENABLE_CHIRP;
