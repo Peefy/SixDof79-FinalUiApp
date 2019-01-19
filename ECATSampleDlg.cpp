@@ -101,6 +101,7 @@ SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
 #if PATH_DATA_USE_DDA
+
 MovingAverageFilterType rollFiter = {120, 1.0};
 MovingAverageFilterType yawFiter = {10, 1.0};
 MovingAverageFilterType pitchFiter = {40, 1.3};
@@ -110,7 +111,9 @@ MovingAverageFilterType yFiter = {20, 1.0};
 MovingAverageFilterType zFiter = {20, 3.0};
 double ShockVal = 0.1;
 double ShockHz = 8.0;
+
 #else
+
 MovingAverageFilterType rollFiter = {18, 1.0};
 MovingAverageFilterType yawFiter = {1, 1.0};
 MovingAverageFilterType pitchFiter = {6, 1.3};
@@ -120,8 +123,8 @@ MovingAverageFilterType yFiter = {2, 1.0};
 MovingAverageFilterType zFiter = {2, 3.0};
 double ShockVal = 1.0;
 double ShockHz = 188.0;
-#endif
 
+#endif
 
 double controlOut[FREEDOM_NUM];
 
@@ -270,7 +273,7 @@ void SensorRead()
 void VisionDataDeal()
 {
 	vision.RenewVisionData();
-	if (vision.IsRecievedData == false)
+	//if (vision.IsRecievedData == false)
 		return;
 	if (vision.RecieveState.IsConsoleInitial)
 	{
@@ -505,7 +508,7 @@ void SixdofControl()
 							data.Y = (int16_t)(vision.Y * 10);
 							data.Z = (int16_t)(vision.Z * 10);
 							data.Roll = (int16_t)(vision.Roll * 100);
-							data.Yaw = (int16_t)(pitch * 100);
+							data.Yaw = (int16_t)(vision.Yaw * 100);
 							data.Pitch = (int16_t)(vision.Pitch * 100);
 
 #if PATH_DATA_USE_DDA
