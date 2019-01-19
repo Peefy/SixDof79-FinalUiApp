@@ -288,7 +288,7 @@ void MotionControl::SixdofControl(I32* pulse)
 	{
 		pulse[i] = RANGE(pulse[i], -MAX_PULSE_NUM, MAX_PULSE_NUM);
 
-		auto re = (I32)((pulse[i] - last_pulse[i]) * 4.2);
+		auto re = (I32)((pulse[i] - last_pulse[i]) * 5);
 		now_vel[i] = re >= 0 ? re : -re;
 		now_vel[i] = RANGE(now_vel[i], 0, MAX_VEL);
 		auto status = _ECAT_Slave_CSP_Start_Move(this->CardNo, this->NodeId[i], this->SlotId[i],

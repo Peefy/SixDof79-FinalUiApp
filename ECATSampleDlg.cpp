@@ -56,7 +56,7 @@ using namespace std;
 
 #define TIMER_MS 10
 
-#define SIXDOF_CONTROL_DELEY     50
+#define SIXDOF_CONTROL_DELEY     40
 #define SCENE_THREAD_DELAY       1000
 #define SENSOR_THREAD_DELAY      1000
 #define DATA_BUFFER_THREAD_DELAY 1000
@@ -242,9 +242,9 @@ void CloseThread()
 void OpenThread()
 {
 	DataThread = (HANDLE)CreateThread(NULL, 0, DataTransThread, NULL, 0, NULL);
-	SensorThread = (HANDLE)CreateThread(NULL, 0, SensorInfoThread, NULL, 0, NULL);
-	SceneThread = (HANDLE)CreateThread(NULL, 0, SceneInfoThread, NULL, 0, NULL);
-	DataBufferThread = (HANDLE)CreateThread(NULL, 0, DataBufferInfoThread, NULL, 0, NULL);
+	//SensorThread = (HANDLE)CreateThread(NULL, 0, SensorInfoThread, NULL, 0, NULL);
+	//SceneThread = (HANDLE)CreateThread(NULL, 0, SceneInfoThread, NULL, 0, NULL);
+	//DataBufferThread = (HANDLE)CreateThread(NULL, 0, DataBufferInfoThread, NULL, 0, NULL);
 }
 
 void SensorRead()
@@ -328,16 +328,17 @@ void VisionDataDeal()
 void SixdofControl()
 {
 	VisionDataDeal();
+	Sleep(10);
 	if (closeDataThread == false)
 	{	
 		U16 upCount = DDA_UP_COUNT;
 		DWORD start_time = 0;
 		start_time = GetTickCount();
-		auto delay = isTest == true ? SIXDOF_CONTROL_DELEY : 10;
+		auto delay = isTest == true ? SIXDOF_CONTROL_DELEY : 0;
 		auto onceCount = isTest == true ? DDA_ONCE_COUNT : 1;
 		if (isCsp == false)
 		{
-			delay = isTest == true ? SIXDOF_CONTROL_DELEY : 10;
+			delay = isTest == true ? SIXDOF_CONTROL_DELEY : 0;
 			Counter = delta.GetDDACount();
 			if (Counter < upCount)
 			{
