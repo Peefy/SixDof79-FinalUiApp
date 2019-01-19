@@ -214,5 +214,5 @@ double MyMAFilter(MovingAverageFilterType* This, double InputData)
 	{
 		This->DataTotal += This->DataHistory[Index_Temp];
 	}
-	return This->DataTotal / (double)This->FilterLevel;
+	return This->DataTotal / (double)This->FilterLevel * This->Scale;
 }

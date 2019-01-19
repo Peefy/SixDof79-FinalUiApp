@@ -100,13 +100,13 @@ LandVision vision;
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
-MovingAverageFilterType rollFiter = {24};
-MovingAverageFilterType yawFiter = {1};
-MovingAverageFilterType pitchFiter = {5};
+MovingAverageFilterType rollFiter = {48, 1.8};
+MovingAverageFilterType yawFiter = {1, 1.0};
+MovingAverageFilterType pitchFiter = {5, 1.0};
 
-MovingAverageFilterType xFiter = {2};
-MovingAverageFilterType yFiter = {2};
-MovingAverageFilterType zFiter = {2};
+MovingAverageFilterType xFiter = {2, 1.0};
+MovingAverageFilterType yFiter = {2, 1.0};
+MovingAverageFilterType zFiter = {2, 3.0};
 
 double controlOut[FREEDOM_NUM];
 
@@ -1035,8 +1035,6 @@ void CECATSampleDlg::OnPaint()
 	{
 		CDialog::OnPaint();
 	}
-	RenderScene();
-	ShowInitImage();
 }
 
 HCURSOR CECATSampleDlg::OnQueryDragIcon()

@@ -37,6 +37,7 @@ typedef struct
 {
 	//public:
 	unsigned char FilterLevel;	
+	double Scale;
 	//private:					
 	double DataHistory[FILTER_DATA_NUM];		
 	double DataTotal;			
