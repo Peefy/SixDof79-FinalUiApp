@@ -100,7 +100,7 @@ LandVision vision;
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
-MovingAverageFilterType rollFiter = {48};
+MovingAverageFilterType rollFiter = {24};
 MovingAverageFilterType yawFiter = {1};
 MovingAverageFilterType pitchFiter = {5};
 
