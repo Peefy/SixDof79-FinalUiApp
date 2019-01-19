@@ -68,8 +68,8 @@ using namespace std;
 #define ENABLE_CHIRP  true
 #define ENABLE_SHOCK  true
 
-double ShockVal = 0.1;
-double ShockHz = 8.0;
+#define PATH_DATA_USE_DDA 0
+
 bool enableShock = ENABLE_SHOCK;
 bool enableChirp = ENABLE_CHIRP;
 bool stopSCurve = false;
@@ -100,13 +100,28 @@ LandVision vision;
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
-MovingAverageFilterType rollFiter = {48, 1.8};
+#if PATH_DATA_USE_DDA
+MovingAverageFilterType rollFiter = {120, 1.0};
+MovingAverageFilterType yawFiter = {10, 1.0};
+MovingAverageFilterType pitchFiter = {40, 1.3};
+
+MovingAverageFilterType xFiter = {20, 1.0};
+MovingAverageFilterType yFiter = {20, 1.0};
+MovingAverageFilterType zFiter = {20, 3.0};
+double ShockVal = 0.1;
+double ShockHz = 8.0;
+#else
+MovingAverageFilterType rollFiter = {18, 1.0};
 MovingAverageFilterType yawFiter = {1, 1.0};
-MovingAverageFilterType pitchFiter = {5, 1.0};
+MovingAverageFilterType pitchFiter = {6, 1.3};
 
 MovingAverageFilterType xFiter = {2, 1.0};
 MovingAverageFilterType yFiter = {2, 1.0};
 MovingAverageFilterType zFiter = {2, 3.0};
+double ShockVal = 1.0;
+double ShockHz = 188.0;
+#endif
+
 
 double controlOut[FREEDOM_NUM];
 
@@ -317,8 +332,8 @@ void VisionDataDeal()
 		}
 	}
 	enableShock = vision.GetIsShock();
-	ShockHz = vision.GetShockHzFromRoadType();
-	ShockVal = vision.GetShockValFromRoadType();
+	//ShockHz = vision.GetShockHzFromRoadType();
+	//ShockVal = vision.GetShockValFromRoadType();
 	if (vision.RecieveState.GetFunction(7) == true)
 	{
 		vision.SendVisionData();
@@ -334,11 +349,15 @@ void SixdofControl()
 		U16 upCount = DDA_UP_COUNT;
 		DWORD start_time = 0;
 		start_time = GetTickCount();
+#if PATH_DATA_USE_DDA
+		auto delay = isTest == true ? SIXDOF_CONTROL_DELEY : SIXDOF_CONTROL_DELEY;
+		auto onceCount = isTest == true ? DDA_ONCE_COUNT : DDA_ONCE_COUNT;
+#else
 		auto delay = isTest == true ? SIXDOF_CONTROL_DELEY : 0;
 		auto onceCount = isTest == true ? DDA_ONCE_COUNT : 1;
+#endif
 		if (isCsp == false)
 		{
-			delay = isTest == true ? SIXDOF_CONTROL_DELEY : 0;
 			Counter = delta.GetDDACount();
 			if (Counter < upCount)
 			{
@@ -465,12 +484,6 @@ void SixdofControl()
 							double pi = 3.1415926;
 							double shockVal = ShockVal;
 							double shockHz = ShockHz;
-							data.X = (int16_t)(vision.X * 10);
-							data.Y = (int16_t)(vision.Y * 10);
-							data.Z = (int16_t)(vision.Z * 10);
-							data.Roll = (int16_t)(vision.Roll * 100);
-							data.Yaw = (int16_t)(vision.Yaw * 100);
-							data.Pitch = (int16_t)(vision.Pitch * 100);
 							auto shockz = sin(2 * pi * shockHz * t) * shockVal;
 							auto x = RANGE(MyMAFilter(&xFiter, vision.X), -VISION_MAX_XYZ, VISION_MAX_XYZ);
 							auto y = RANGE(MyMAFilter(&yFiter, vision.Y), -VISION_MAX_XYZ, VISION_MAX_XYZ);
@@ -478,7 +491,7 @@ void SixdofControl()
 							auto roll = RANGE(MyMAFilter(&rollFiter, vision.Roll), -VISION_MAX_DEG, VISION_MAX_DEG);
 							auto pitch = RANGE(MyMAFilter(&pitchFiter, vision.Pitch), -VISION_MAX_DEG, VISION_MAX_DEG);
 							auto yaw = RANGE(MyMAFilter(&yawFiter, vision.Yaw), -VISION_MAX_DEG, VISION_MAX_DEG);
-							z += (enableShock == true ? shockz : 0);
+							//z += (enableShock == true ? shockz : 0);
 							double* pulse_dugu = Control(x, y, z + shockz, roll, yaw, pitch);
 							for (auto ii = 0; ii < AXES_COUNT; ++ii)
 							{
@@ -488,8 +501,20 @@ void SixdofControl()
 								auto pulse = pulse_cal[ii];
 								dis[ii] = (int)pulse;
 							}
+							data.X = (int16_t)(vision.X * 10);
+							data.Y = (int16_t)(vision.Y * 10);
+							data.Z = (int16_t)(vision.Z * 10);
+							data.Roll = (int16_t)(vision.Roll * 100);
+							data.Yaw = (int16_t)(pitch * 100);
+							data.Pitch = (int16_t)(vision.Pitch * 100);
+
+#if PATH_DATA_USE_DDA
+							t += 0.00095;
+							delta.SetDDAData(dis);
+#else
 							t += 0.01;
 							delta.Csp(dis);
+#endif
 						}
 
 					}
@@ -1231,6 +1256,11 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 	    MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
 		return;
 	}
+#if PATH_DATA_USE_DDA
+	delta.EnableDDA();
+	delta.ServoStop();
+#else
+#endif
 	status = SIXDOF_STATUS_RUN;
 	Sleep(100);
 	delta.RenewNowPulse();
@@ -1241,14 +1271,13 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 	t = 0;
 	dataChartTime = 0;
 
-	time_t currtime = time(NULL);
-	struct tm* p = gmtime(&currtime);
-	sprintf_s(fileName, "./datas/pathdata%d-%d-%d-%d-%d-%d.txt", p->tm_year + 1990, p->tm_mon + 1,
-		p->tm_mday, p->tm_hour + 8, p->tm_min, p->tm_sec);
+	//time_t currtime = time(NULL);
+	//struct tm* p = gmtime(&currtime);
+	//sprintf_s(fileName, "./datas/pathdata%d-%d-%d-%d-%d-%d.txt", p->tm_year + 1990, p->tm_mon + 1,
+	//	p->tm_mday, p->tm_hour + 8, p->tm_min, p->tm_sec);
 
 	closeDataThread = false;
 	isStart = true;	
-	delete p;
 }
 
 void CECATSampleDlg::OnBnClickedBtnStopme()
