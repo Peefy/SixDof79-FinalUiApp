@@ -198,6 +198,9 @@
     <ClCompile Include="control\illusion.cpp">
       <Filter>control</Filter>
     </ClCompile>
+    <ClCompile Include="control\udp.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ECATSample.rc">
@@ -443,6 +446,9 @@
       <Filter>cwnds</Filter>
     </ClInclude>
     <ClInclude Include="control\illusion.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\udp.h">
       <Filter>control</Filter>
     </ClInclude>
   </ItemGroup>

@@ -173,6 +173,7 @@
     <ClCompile Include="control\landvision.cpp" />
     <ClCompile Include="control\pid.cpp" />
     <ClCompile Include="control\sensor.cpp" />
+    <ClCompile Include="control\udp.cpp" />
     <ClCompile Include="cwnds\panel.cpp" />
     <ClCompile Include="DialogRegister.cpp" />
     <ClCompile Include="ECATSample.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="control\landvision.h" />
     <ClInclude Include="control\pid.h" />
     <ClInclude Include="control\sensor.h" />
+    <ClInclude Include="control\udp.h" />
     <ClInclude Include="cwnds\panel.h" />
     <ClInclude Include="DialogRegister.h" />
     <ClInclude Include="ECATSample.h" />

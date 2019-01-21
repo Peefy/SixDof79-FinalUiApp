@@ -3,6 +3,23 @@
 #define _ILLUSION_H_ 
 
 #include "stdint.h"
+#include "udp.h"
+
+#define UDP_PORT        9000
+#define UDP_IP_STRING   "192.168.0.104"
+
+#define ILLUSION_RECIEVE_BUFFER_MAX   1024
+#define ILLUSION_FLAG_START_INT32     999
+#define ILLUSION_FLAG_END_INT32       888
+
+#define ILLUSION_CTL_CMD_START_INT32       111
+#define ILLUSION_CTL_CMD_STOP_INT32        777
+#define ILLUSION_CTL_CMD_CONNECT_INT32     222
+#define ILLUSION_CTL_CMD_DISCONNECT_INT32  333
+#define ILLUSION_CTL_CMD_PAUSE_INT32       555
+#define ILLUSION_CTL_CMD_RECOVER_INT32     666
+
+UdpClient udpClient = UdpClient(9000);
 
 #pragma pack (1)
 typedef struct
@@ -71,6 +88,27 @@ typedef struct
 	int flagend;      //61. (888)
 }IllusionPackage;
 #pragma pack () 
+
+class IllusionDataAdapter
+{
+public:
+	IllusionDataAdapter();
+	~IllusionDataAdapter();
+	void RenewData();
+	void SendData();
+	bool IsRecievedData;
+	double Roll;
+	double Yaw;
+	double Pitch;
+	double X;
+	double Y;
+	double Z;
+private:
+	IllusionPackage Data;
+	void RenewInnerData();
+};
+
+
 
 #endif // !
 
