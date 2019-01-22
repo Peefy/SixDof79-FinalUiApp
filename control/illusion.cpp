@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "illusion.h"
 
+UdpClient udpClient = UdpClient(9000);
+
 IllusionDataAdapter::IllusionDataAdapter()
 {
 }

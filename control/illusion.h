@@ -19,8 +19,6 @@
 #define ILLUSION_CTL_CMD_PAUSE_INT32       555
 #define ILLUSION_CTL_CMD_RECOVER_INT32     666
 
-UdpClient udpClient = UdpClient(9000);
-
 #pragma pack (1)
 typedef struct
 {

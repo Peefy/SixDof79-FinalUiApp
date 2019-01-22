@@ -25,7 +25,7 @@
 #include "control/sensor.h"
 #include "control/pid.h"
 #include "control/kalman_filter.h"
-#include "control/landvision.h"
+#include "control/illusion.h"
 
 #include "config/recordpath.h"
 
@@ -95,7 +95,7 @@ int poleLengthRenderCount = 0;
 
 MotionControl delta;
 DataPackage data;
-LandVision vision;
+IllusionDataAdapter vision;
 
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
@@ -272,75 +272,9 @@ void SensorRead()
 
 void VisionDataDeal()
 {
-	vision.RenewVisionData();
-	//if (vision.IsRecievedData == false)
+	vision.RenewData();
+	if (vision.IsRecievedData == false)
 		return;
-	if (vision.RecieveState.IsConsoleInitial)
-	{
-		if (status == SIXDOF_STATUS_BOTTOM)
-		{
-			delta.DownUsingHomeMode();
-			Sleep(100);
-			delta.ReadAllSwitchStatus();
-			Sleep(50);
-			if (delta.IsAllAtBottom() == false)
-			{
-				return;
-			}	
-			status = SIXDOF_STATUS_ISRISING;	
-			delta.ResetStatus();
-			auto more_time_count = 10;
-			for (auto i = 0;i < more_time_count; ++i)
-			{
-				delta.ResetAlarm();
-				Sleep(50);
-			}
-			delta.Rise();
-			Sleep(50);
-			Sleep(4000);
-			status = SIXDOF_STATUS_RUN;
-			delta.RenewNowPulse();
-			delta.ResetStatus();
-			delta.GetMotionAveragePulse();
-			isTest = false;
-			sin_time_pulse = 0;
-			t = 0;
-			dataChartTime = 0;
-			closeDataThread = false;
-			isStart = true;	
-		}
-		if (status == SIXDOF_STATUS_READY)
-		{
-			status = SIXDOF_STATUS_RUN;
-			delta.RenewNowPulse();
-			delta.ResetStatus();
-			delta.GetMotionAveragePulse();
-			isTest = false;
-			sin_time_pulse = 0;
-			t = 0;
-			dataChartTime = 0;
-			closeDataThread = false;
-			isStart = true;	
-		}
-	}
-	if (vision.RecieveState.IsConsoleZero)
-	{
-		if (status == SIXDOF_STATUS_RUN)
-		{
-			stopSCurve = true;
-			closeDataThread = true;
-			delta.MoveToZeroPulseNumber();
-			status = SIXDOF_STATUS_READY;
-			ResetDefaultData(&data);
-		}
-	}
-	enableShock = vision.GetIsShock();
-	//ShockHz = vision.GetShockHzFromRoadType();
-	//ShockVal = vision.GetShockValFromRoadType();
-	if (vision.RecieveState.GetFunction(7) == true)
-	{
-		vision.SendVisionData();
-	}
 }
 
 void SixdofControl()
@@ -792,7 +726,6 @@ void CECATSampleDlg::AppInit()
 		CircleTopRadius, CircleBottomRadius, DistanceBetweenHingeTop,
 		DistanceBetweenHingeBottom);
 	OpenThread();
-	vision.Open(VISION_PORT, VISION_BAUDRATE);
 }
 
 double CECATSampleDlg::GetCEditNumber(int cEditId)
@@ -1329,7 +1262,6 @@ void CECATSampleDlg::OnBnClickedBtnDown()
 
 void CECATSampleDlg::OnBnClickedOk()
 {
-	vision.Close();
 	CloseThread();
 	delta.ServoStop();
 	Sleep(100);

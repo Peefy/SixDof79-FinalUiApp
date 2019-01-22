@@ -29,9 +29,9 @@
 
 //电机到丝杠的导程 一圈大概是6mm, 缸最大伸长量为700mm
 #define MAX_POLE_LENGTH 700 / 2.0
-#define PULSE_PER_R 1280000
-#define MM_PER_R 6.00
-#define LENGTH_TO_PULSE_SCALE 213333.333333333
+#define PULSE_PER_R 8388608
+#define MM_PER_R 20.00
+#define LENGTH_TO_PULSE_SCALE 419430.4
 
 #define FREEDOM_X_INDEX     0
 #define FREEDOM_Y_INDEX     1

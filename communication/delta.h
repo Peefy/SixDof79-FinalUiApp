@@ -20,7 +20,7 @@
 
 #define MAX_ACC 0.1
 
-#define DIS_PER_R 1280000
+#define DIS_PER_R 8388608
 
 #define RISE_RPM 15
 #define DOWN_RPM 30
@@ -36,12 +36,19 @@
 #define DOWN_ERROR_REGISTER 0x20
 #define DOWN_ALARM_CODE     0x14
 
-#define PlaneAboveHingeLength       100.0
-#define PlaneAboveBottomLength      700.0
-#define CircleTopRadius             680.0
-#define CircleBottomRadius          840.0
-#define DistanceBetweenHingeTop     190.0
-#define DistanceBetweenHingeBottom  190.0
+// 缸的最大行程
+#define MAX_MM 700.0
+// 单位mm
+#define MM_RPM 20.0
+
+#define PlaneAboveHingeLength       190.0
+#define PlaneAboveBottomLength      1700.0
+#define CircleTopRadius             880.7
+#define CircleBottomRadius          1519.0
+#define DistanceBetweenHingeTop     200.0
+#define DistanceBetweenHingeBottom  300.0
+
+
 
 class MotionControl
 {
