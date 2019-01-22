@@ -29,6 +29,26 @@ double[4] 杆5的伸长量
 double[5] 杆6的伸长量
 */
 SIXDOFDLL2010_API double* Control(double x, double y, double z, double roll, double yaw, double pitch);
+
+/*
+由缸的伸长行程获取姿态角，位移单位为毫米(mm)，角度单位为角度(deg)
+@para
+lengths[0] 杆1的伸长量 
+lengths[1] 杆2的伸长量
+lengths[2] 杆3的伸长量
+lengths[3] 杆4的伸长量
+lengths[4] 杆5的伸长量
+lengths[5] 杆6的伸长量
+@return
+x : X轴位移 mm
+y : y轴位移 mm
+z : z轴位移 mm
+a = roll : 横滚角 deg
+b = pitch : 俯仰角 deg
+c = yaw : 偏航角 deg
+*/
+SIXDOFDLL2010_API double* FromLengthToPose(double * lengths);
+
 /*
 获取 顶部铰链的空间坐标，坐标原点为平台升起后中立位顶部平台中心，单位为毫米(mm)
 @return
@@ -69,6 +89,21 @@ z : z坐标
 bool 是否设置成功
 */
 SIXDOFDLL2010_API bool SetBottomPosition(int index, double x, double y, double z);
+
+/*
+设置 六自由度平台的结构参数，单位为毫米(mm)
+@para
+planeAboveHingeLength : 上平台上表面距离上平台铰链的垂直距离
+planeAboveBottomLength : 上平台上表面距离地面的垂直距离
+circleTopRadius : 上平台圆圈半径
+circleBottomRadius : 下平台圆圈半径
+distanceBetweenHinge : 上平台同一组两个铰链的中心距离
+@return
+bool 是否设置成功
+*/
+SIXDOFDLL2010_API void SetPlatformPara(double planeAboveHingeLength, double planeAboveBottomLength, double circleTopRadius, 
+									   double circleBottomRadius, double distanceBetweenHingeTop, double distanceBetweenHingeBottom);
+
 
 #ifdef __cplusplus
 }
