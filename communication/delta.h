@@ -20,7 +20,7 @@
 
 #define MAX_ACC 0.1
 
-#define DIS_PER_R 8388608
+#define DIS_PER_R 1280000
 
 #define RISE_RPM 15
 #define DOWN_RPM 30
@@ -36,44 +36,37 @@
 #define DOWN_ERROR_REGISTER 0x20
 #define DOWN_ALARM_CODE     0x14
 
-// 缸的最大行程
-#define MAX_MM 700.0
-// 单位mm
-#define MM_RPM 20.0
-
-#define PlaneAboveHingeLength       190.0
-#define PlaneAboveBottomLength      1700.0
-#define CircleTopRadius             880.7
-#define CircleBottomRadius          1519.0
-#define DistanceBetweenHingeTop     200.0
-#define DistanceBetweenHingeBottom  300.0
-
-
+#define PlaneAboveHingeLength       100.0
+#define PlaneAboveBottomLength      700.0
+#define CircleTopRadius             680.0
+#define CircleBottomRadius          840.0
+#define DistanceBetweenHingeTop     190.0
+#define DistanceBetweenHingeBottom  190.0
 
 class MotionControl
 {
 public:
-    MotionControl();
-    ~MotionControl();
-    bool InitCard();
-    bool FindSlave();
-    bool ServoAllOnOff(bool isOn);
-    bool ServoStop();
+	MotionControl();
+	~MotionControl();
+	bool InitCard();
+	bool FindSlave();
+	bool ServoAllOnOff(bool isOn);
+	bool ServoStop();
 	bool ServoSingleStop(int index);
 	bool ServoSingleMove(int index, int pulse, int isAbs);
 	bool ResetAlarmSingle(int index);
-    bool ResetAlarm();
-    bool ResetStatus();
+	bool ResetAlarm();
+	bool ResetStatus();
 	void Csp(I32 * pulse);
 	void Rise();
- 	void RiseWithSingle();
+	void RiseWithSingle();
 	void Middle();
 	void Down();
 	void DownUsingHomeMode();
 	void StepDown();
 	void DisableDDA();
 	void EnableDDA();
-    void Close();
+	void Close();
 	void LockServo();
 	void MoveToZeroPulseNumber();
 	int GetDDACount();
@@ -82,13 +75,13 @@ public:
 	void RenewNowPulse();
 	bool GetLimitSwitch();
 	U16 GetBufferLength();
-    U16 ESCExistCards;
-    U16 ESCCardNoList[ESCtMaxCardNum];
-    U16 CardNo;
-    U16 SlaveNum;
+	U16 ESCExistCards;
+	U16 ESCCardNoList[ESCtMaxCardNum];
+	U16 CardNo;
+	U16 SlaveNum;
 	U16 DDAGroupNo;
-    U16 NodeId[AXES_NUM];
-    U16 SlotId[AXES_NUM];
+	U16 NodeId[AXES_NUM];
+	U16 SlotId[AXES_NUM];
 	U16 DioSlotId[AXES_NUM];
 	I32 NowPluse[AXES_NUM];
 	I32 AvrPulse;
@@ -100,12 +93,9 @@ public:
 	bool CheckStatus(SixDofPlatformStatus& status);
 	bool PowerOnSelfTest(SixDofPlatformStatus laststatus, I32 * lastpulse);
 private:
-    bool disposed;
+	bool disposed;
 	void Control(I32* pulse);
 	void SixdofControl(I32* pulse);
 };
 
-
-
 #endif // !_DELTA_H_
-

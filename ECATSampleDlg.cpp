@@ -25,7 +25,7 @@
 #include "control/sensor.h"
 #include "control/pid.h"
 #include "control/kalman_filter.h"
-#include "control/illusion.h"
+#include "control/landvision.h"
 
 #include "config/recordpath.h"
 
@@ -46,7 +46,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
+	static char THIS_FILE[] = __FILE__;
 #endif
 
 using namespace std;
@@ -95,7 +95,7 @@ int poleLengthRenderCount = 0;
 
 MotionControl delta;
 DataPackage data;
-IllusionDataAdapter vision;
+LandVision vision;
 
 SixDofPlatformStatus status = SIXDOF_STATUS_BOTTOM;
 SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
@@ -272,9 +272,75 @@ void SensorRead()
 
 void VisionDataDeal()
 {
-	vision.RenewData();
-	if (vision.IsRecievedData == false)
-		return;
+	vision.RenewVisionData();
+	//if (vision.IsRecievedData == false)
+	return;
+	if (vision.RecieveState.IsConsoleInitial)
+	{
+		if (status == SIXDOF_STATUS_BOTTOM)
+		{
+			delta.DownUsingHomeMode();
+			Sleep(100);
+			delta.ReadAllSwitchStatus();
+			Sleep(50);
+			if (delta.IsAllAtBottom() == false)
+			{
+				return;
+			}	
+			status = SIXDOF_STATUS_ISRISING;	
+			delta.ResetStatus();
+			auto more_time_count = 10;
+			for (auto i = 0;i < more_time_count; ++i)
+			{
+				delta.ResetAlarm();
+				Sleep(50);
+			}
+			delta.Rise();
+			Sleep(50);
+			Sleep(4000);
+			status = SIXDOF_STATUS_RUN;
+			delta.RenewNowPulse();
+			delta.ResetStatus();
+			delta.GetMotionAveragePulse();
+			isTest = false;
+			sin_time_pulse = 0;
+			t = 0;
+			dataChartTime = 0;
+			closeDataThread = false;
+			isStart = true;	
+		}
+		if (status == SIXDOF_STATUS_READY)
+		{
+			status = SIXDOF_STATUS_RUN;
+			delta.RenewNowPulse();
+			delta.ResetStatus();
+			delta.GetMotionAveragePulse();
+			isTest = false;
+			sin_time_pulse = 0;
+			t = 0;
+			dataChartTime = 0;
+			closeDataThread = false;
+			isStart = true;	
+		}
+	}
+	if (vision.RecieveState.IsConsoleZero)
+	{
+		if (status == SIXDOF_STATUS_RUN)
+		{
+			stopSCurve = true;
+			closeDataThread = true;
+			delta.MoveToZeroPulseNumber();
+			status = SIXDOF_STATUS_READY;
+			ResetDefaultData(&data);
+		}
+	}
+	enableShock = vision.GetIsShock();
+	//ShockHz = vision.GetShockHzFromRoadType();
+	//ShockVal = vision.GetShockValFromRoadType();
+	if (vision.RecieveState.GetFunction(7) == true)
+	{
+		vision.SendVisionData();
+	}
 }
 
 void SixdofControl()
@@ -596,10 +662,10 @@ void CECATSampleDlg::ChartInit()
 	pLineSerie1->SetSeriesOrdering(poNoOrdering);
 	pLineSerie1->SetWidth(2);
 	pLineSerie1->SetName(_T(IDC_STATIC_X_VAL_SHOW_TEXT));
-	
+
 	pLineSerie2 = m_ChartCtrl1.CreateLineSerie();
 	pLineSerie2->SetSeriesOrdering(poNoOrdering);
-	
+
 	pLineSerie2->SetWidth(2);
 	pLineSerie2->SetName(_T(IDC_STATIC_Y_VAL_SHOW_TEXT)); 
 
@@ -726,6 +792,7 @@ void CECATSampleDlg::AppInit()
 		CircleTopRadius, CircleBottomRadius, DistanceBetweenHingeTop,
 		DistanceBetweenHingeBottom);
 	OpenThread();
+	vision.Open(VISION_PORT, VISION_BAUDRATE);
 }
 
 double CECATSampleDlg::GetCEditNumber(int cEditId)
@@ -747,7 +814,7 @@ BOOL CECATSampleDlg::OnInitDialog()
 
 	SetIcon(m_hIcon, TRUE);			
 	SetIcon(m_hIcon, FALSE);	
-	
+
 	AppInit();
 	InitOpenGlControl();
 	SetTimer(0, TIMER_MS, NULL);
@@ -1071,7 +1138,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 		vision.X, vision.Y, vision.Z,
 		vision.Roll, vision.Pitch, vision.Yaw);
 	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
-	
+
 	delta.CheckStatus(status);
 	if(InitialFlag == 0)
 	{
@@ -1135,7 +1202,7 @@ void CECATSampleDlg::OnOK()
 
 void CECATSampleDlg::OnChkAbs() 
 {
-	
+
 }
 
 void CECATSampleDlg::OnBnClickedBtnRise()
@@ -1192,7 +1259,7 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 {
 	if (status != SIXDOF_STATUS_READY)
 	{
-	    MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
+		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
 		return;
 	}
 #if PATH_DATA_USE_DDA
@@ -1262,6 +1329,7 @@ void CECATSampleDlg::OnBnClickedBtnDown()
 
 void CECATSampleDlg::OnBnClickedOk()
 {
+	vision.Close();
 	CloseThread();
 	delta.ServoStop();
 	Sleep(100);
