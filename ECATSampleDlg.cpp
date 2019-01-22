@@ -13,9 +13,9 @@
 #include "EtherCAT_DLL.h"
 #include "EtherCAT_DLL_Err.h"
 
-#include "chart.h"
-
 #include "Sixdofdll2010.h"
+
+#include "chart.h"
 
 #include "communication/sixdof.h"
 #include "communication/communication.h"
@@ -35,8 +35,6 @@
 #include "util/model.h"
 
 #include "register/register.h"
-
-#include "Sixdofdll2010.h"
 
 #include "glut.h"
 #include "opengl/sixdofopenglhelper.h"
@@ -862,7 +860,7 @@ BOOL CECATSampleDlg::PreTranslateMessage(MSG* pMsg)
 BOOL CECATSampleDlg::PreCreateWindow(CREATESTRUCT& cs)
 {
 	cs.style |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-	return CECATSampleDlg::PreCreateWindow(cs);
+	return CDialog::PreCreateWindow(cs);
 }
 
 void CECATSampleDlg::InitOpenGlControl()

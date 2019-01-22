@@ -56,7 +56,7 @@ bool BaseCom<T>::Open(int portNumber, int baudRate)
 {
 	PortNumber = portNumber;
 	BaudRate = baudRate;
-	return OpenCOMDevice(portNumber, baudRate);
+	return OpenCOMDevice(portNumber, baudRate) == 1;
 }
 
 template <typename T>
