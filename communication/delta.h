@@ -36,6 +36,13 @@
 #define DOWN_ERROR_REGISTER 0x20
 #define DOWN_ALARM_CODE     0x14
 
+#define PlaneAboveHingeLength       100.0
+#define PlaneAboveBottomLength      700.0
+#define CircleTopRadius             680.0
+#define CircleBottomRadius          840.0
+#define DistanceBetweenHingeTop     190.0
+#define DistanceBetweenHingeBottom  190.0
+
 class MotionControl
 {
 public:

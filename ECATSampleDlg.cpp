@@ -788,6 +788,9 @@ void CECATSampleDlg::AppInit()
 		((CComboBox*)GetDlgItem(IDC_CBO_SingleNo))->AddString(xx);
 	}
 	((CComboBox*)GetDlgItem(IDC_CBO_SingleNo))->SetCurSel(0);
+	SetPlatformPara(PlaneAboveHingeLength, PlaneAboveBottomLength, 
+		CircleTopRadius, CircleBottomRadius, DistanceBetweenHingeTop,
+		DistanceBetweenHingeBottom);
 	OpenThread();
 	vision.Open(VISION_PORT, VISION_BAUDRATE);
 }
