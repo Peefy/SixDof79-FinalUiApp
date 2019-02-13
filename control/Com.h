@@ -2,6 +2,7 @@
 #define __UART_NET_H
 
 #include "stdint.h"
+#include "../config/inihelper.h"
 
 signed char	SendUARTMessageLength(const unsigned long ulChannelNo, const char chrMessage[],const unsigned short usLen);
 unsigned short CollectUARTData(const unsigned long ulChannelNo, char chrUARTBufferOutput[]);
@@ -54,9 +55,13 @@ BaseCom<T>::~BaseCom()
 template <typename T>
 bool BaseCom<T>::Open(int portNumber, int baudRate)
 {
-	PortNumber = portNumber;
-	BaudRate = baudRate;
-	return OpenCOMDevice(portNumber, baudRate) == 1;
+	bool result;
+	int baud;
+	int portnum;
+	config::ReadAll(result, baud, portnum);
+	PortNumber = portnum;
+	BaudRate = baud;
+	return OpenCOMDevice(portnum, baud) == 1;
 }
 
 template <typename T>
