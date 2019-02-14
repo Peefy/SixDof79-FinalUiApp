@@ -1166,7 +1166,6 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 		visionRoll, visionPitch, visionYaw);
 	LeaveCriticalSection(&csdata);
 
-
 	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
 	EnterCriticalSection(&cs);
 	delta.CheckStatus(status);
