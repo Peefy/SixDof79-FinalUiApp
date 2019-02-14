@@ -167,6 +167,9 @@ char fileName[100] = "";
 bool isCsp = false;
 U16 Counter = 0;
 
+// 线程锁
+CRITICAL_SECTION cs;
+
 DWORD WINAPI DataTransThread(LPVOID pParam)
 {
 	while (true)
@@ -257,6 +260,7 @@ void CloseThread()
 
 void OpenThread()
 {
+	InitializeCriticalSection(&cs);
 	DataThread = (HANDLE)CreateThread(NULL, 0, DataTransThread, NULL, 0, NULL);
 	//SensorThread = (HANDLE)CreateThread(NULL, 0, SensorInfoThread, NULL, 0, NULL);
 	//SceneThread = (HANDLE)CreateThread(NULL, 0, SceneInfoThread, NULL, 0, NULL);
@@ -359,7 +363,14 @@ void SixdofControl()
 #endif
 		if (isCsp == false)
 		{
+#if PATH_DATA_USE_DDA
 			Counter = delta.GetDDACount();
+#else
+			if (isTest == true)
+			{
+				Counter = delta.GetDDACount();
+			}
+#endif		
 			if (Counter < upCount)
 			{
 				I32 dis[AXES_COUNT] = {DIS_PER_R, DIS_PER_R, DIS_PER_R, DIS_PER_R, DIS_PER_R, DIS_PER_R};
@@ -514,7 +525,9 @@ void SixdofControl()
 							delta.SetDDAData(dis);
 #else
 							t += 0.01;
+							EnterCriticalSection(&cs);
 							delta.Csp(dis);
+							LeaveCriticalSection(&cs);
 #endif
 						}
 
@@ -1136,8 +1149,9 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 		vision.X, vision.Y, vision.Z,
 		vision.Roll, vision.Pitch, vision.Yaw);
 	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
-
+	EnterCriticalSection(&cs);
 	delta.CheckStatus(status);
+	LeaveCriticalSection(&cs);
 	if(InitialFlag == 0)
 	{
 		EanbleButton(0);
