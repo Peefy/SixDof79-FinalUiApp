@@ -169,6 +169,13 @@ U16 Counter = 0;
 
 // 线程锁
 CRITICAL_SECTION cs;
+CRITICAL_SECTION csdata;
+double visionX;
+double visionY;
+double visionZ;
+double visionRoll;
+double visionPitch;
+double visionYaw;
 
 DWORD WINAPI DataTransThread(LPVOID pParam)
 {
@@ -261,6 +268,7 @@ void CloseThread()
 void OpenThread()
 {
 	InitializeCriticalSection(&cs);
+	InitializeCriticalSection(&csdata);
 	DataThread = (HANDLE)CreateThread(NULL, 0, DataTransThread, NULL, 0, NULL);
 	//SensorThread = (HANDLE)CreateThread(NULL, 0, SensorInfoThread, NULL, 0, NULL);
 	//SceneThread = (HANDLE)CreateThread(NULL, 0, SceneInfoThread, NULL, 0, NULL);
@@ -348,6 +356,14 @@ void VisionDataDeal()
 void SixdofControl()
 {
 	VisionDataDeal();
+	EnterCriticalSection(&csdata);
+	visionX = vision.X;
+	visionY = vision.Y;
+	visionZ = vision.Z;
+	visionRoll = vision.Roll;
+	visionPitch = vision.Pitch;
+	visionYaw = vision.Yaw;
+	LeaveCriticalSection(&csdata);
 	Sleep(10);
 	if (closeDataThread == false)
 	{	
@@ -1144,10 +1160,13 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 		poleLength[0], poleLength[1], poleLength[2],
 		poleLength[3], poleLength[4], poleLength[5]);
 	SetDlgItemText(IDC_EDIT_Pulse, statusStr);
-
+	EnterCriticalSection(&csdata);
 	statusStr.Format(_T("1:%.2f 2:%.2f 3:%.2f 4:%.2f 5:%.2f 6:%.2f"),
-		vision.X, vision.Y, vision.Z,
-		vision.Roll, vision.Pitch, vision.Yaw);
+		visionX, visionY, visionZ,
+		visionRoll, visionPitch, visionYaw);
+	LeaveCriticalSection(&csdata);
+
+
 	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
 	EnterCriticalSection(&cs);
 	delta.CheckStatus(status);
