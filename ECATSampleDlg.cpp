@@ -284,6 +284,7 @@ void VisionDataDeal()
 {
 	vision.RenewVisionData();
 	//if (vision.IsRecievedData == false)
+	enableShock = vision.IsRecievedData;
 	return;
 	if (vision.RecieveState.IsConsoleInitial)
 	{
@@ -519,8 +520,8 @@ void SixdofControl()
 							auto roll = RANGE(MyMAFilter(&rollFiter, vision.Roll), -VISION_MAX_DEG, VISION_MAX_DEG);
 							auto pitch = RANGE(MyMAFilter(&pitchFiter, vision.Pitch), -VISION_MAX_DEG, VISION_MAX_DEG);
 							auto yaw = RANGE(MyMAFilter(&yawFiter, vision.Yaw), -VISION_MAX_DEG, VISION_MAX_DEG);
-							//z += (enableShock == true ? shockz : 0);
-							double* pulse_dugu = Control(x, y, z + shockz, roll, yaw, pitch);
+							z += (enableShock == true ? shockz : 0);
+							double* pulse_dugu = Control(x, y, z, roll, yaw, pitch);
 							for (auto ii = 0; ii < AXES_COUNT; ++ii)
 							{
 								poleLength[ii] = pulse_dugu[ii];
