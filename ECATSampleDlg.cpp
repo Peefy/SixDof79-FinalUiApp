@@ -1288,6 +1288,11 @@ void CECATSampleDlg::OnBnClickedBtnMiddle()
 
 void CECATSampleDlg::OnBnClickedBtnStart()
 {
+	if (vision.IsRecievedData == false)
+	{
+		MessageBox(_T(SIXDOF_NOT_RECIEVE_BEGIN_MESSAGE));
+		return;
+	}
 	if (status != SIXDOF_STATUS_READY)
 	{
 		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
@@ -1360,14 +1365,17 @@ void CECATSampleDlg::OnBnClickedBtnDown()
 
 void CECATSampleDlg::OnBnClickedOk()
 {
-	vision.Close();
-	CloseThread();
+	closeDataThread = true;
 	delta.ServoStop();
+	Sleep(100);
+	delta.DisableDDA();
 	Sleep(100);
 	delta.ServoAllOnOff(false);
 	delta.LockServo();
 	Sleep(10);
 	delta.Close();
+	vision.Close();
+	CloseThread();
 	CDialog::OnOK();
 }
 

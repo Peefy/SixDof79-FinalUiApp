@@ -61,6 +61,7 @@
 #define SIXDOF_NOT_BOTTOM_AND_RISE_MESSAGE "所有缸不在底部，禁止上升"
 #define SIXDOF_NOT_MIDDLE_MESSAGE "缸没有处于静止，不能回中"
 #define SIXDOF_NOT_BEGIN_MESSAGE "缸没有处于静止，不能开始"
+#define SIXDOF_NOT_RECIEVE_BEGIN_MESSAGE "没有收到视景数据，不能开始"
 #define SIXDOF_NOT_FALLING_MESSAGE "缸没有处于静止，不能下降"
 
 #define IDC_STATIC_PLATFORM_SHOW_TEXT        "六自由度平台状态"
