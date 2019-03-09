@@ -7,6 +7,8 @@
 #define JUDGE_IS_START   if(IsRS422Start == false) return;
 #define JUDGE_IS_RECIEVE if(IsRecievedData == false) return;
 
+#define IS_USE_DELTA_PID 0
+
 InertialNavigation::InertialNavigation()
 {
 	DataInit();
@@ -39,6 +41,16 @@ bool InertialNavigation::Close()
 	return IsRS422Start;
 }
 
+bool InertialNavigation::JudgeCheckByte(char* chars)
+{
+	unsigned char checkbyte = 0;
+	for (int i = CHECK_BYTE_CAL_START_INDEX;i <= CHECK_BYTE_CAL_END_INDEX;++i)
+	{
+		checkbyte += chars[i];
+	}
+	return checkbyte == chars[CHECK_BYTE_INDEX];
+}
+
 void InertialNavigation::RenewData()
 {
 	static char chrTemp[RS422_BUFFER_LENGTH] = {0}; 
@@ -66,7 +78,8 @@ void InertialNavigation::RenewData()
 			continue;
 		}
 		if(chrTemp[1] == RS422_DATA_HEAD_TWO && chrTemp[RS422_DATA_PACKAGE_LEGNTH - 1] == RS422_DATA_TAIL_TWO &&
-			chrTemp[RS422_DATA_PACKAGE_LEGNTH - 2] == RS422_DATA_TAIL_ONE)
+			chrTemp[RS422_DATA_PACKAGE_LEGNTH - 2] == RS422_DATA_TAIL_ONE &&
+			JudgeCheckByte(chrTemp) == true)
 		{
 			memcpy(&data, &chrTemp[0], RS422_DATA_PACKAGE_LEGNTH);
 		}
@@ -209,7 +222,12 @@ void InertialNavigation::PidOut(double * roll, double *yaw, double * pitch)
 	static PID_Type pitchPid = {p, i, d};
 	static PID_Type yawPid = {p, i, d};
 	JUDGE_IS_RECIEVE;
+#if IS_USE_DELTA_PID
 	*roll = MyDeltaPIDWithNoDelta(&rollPid, Roll, finalRoll);
 	//*yaw = MyDeltaPIDWithNoDelta(&yawPid, Yaw, finalYaw);
 	*pitch = MyDeltaPIDWithNoDelta(&pitchPid, Pitch, finalPitch);
+#else
+	*roll = -Roll;
+	*pitch = -Pitch;
+#endif
 }
