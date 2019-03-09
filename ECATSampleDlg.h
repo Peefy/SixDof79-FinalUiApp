@@ -79,6 +79,7 @@ public:
 	afx_msg void OnBnClickedBtnStopme();
 	afx_msg void OnBnClickedBtnDown();
 	void EanbleButton(int isenable);
+	void SixdofPlatformInit();
 	void KalmanFilterInit();
 	void ChartInit();
 	void AppInit();
