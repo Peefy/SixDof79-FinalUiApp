@@ -290,9 +290,7 @@ void SensorRead()
 void VisionDataDeal()
 {
 	vision.RenewVisionData();
-	//if (vision.IsRecievedData == false)
-	//enableShock = vision.IsRecievedData;
-	enableShock = vision.GetIsShock();
+	enableShock = vision.IsRecievedData;
 	return;
 	if (vision.RecieveState.IsConsoleInitial)
 	{

@@ -100,7 +100,7 @@ private:
     void ClosePort();  
       
 private:  
- 
+	char szPort[50];
     /** ´®¿Ú¾ä±ú */   
     HANDLE  m_hComm;  
  

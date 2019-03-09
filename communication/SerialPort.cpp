@@ -102,8 +102,7 @@ bool CSerialPort::InitPort(UINT portNo, const LPDCB &plDCB)
 
 void CSerialPort::ClosePort()
 {
-
-	
+	DeleteFileA(szPort);	
 }
 
 bool CSerialPort::openPort(UINT portNo)
@@ -111,7 +110,6 @@ bool CSerialPort::openPort(UINT portNo)
 
 	EnterCriticalSection(&m_csCommunicationSync);
 
-	char szPort[50];
 	sprintf_s(szPort, "COM%d", portNo);
 
 	m_hComm = CreateFileA(szPort,						

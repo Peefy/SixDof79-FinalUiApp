@@ -7,6 +7,8 @@
 #include <string>
 #include <algorithm>
 
+#include "../communication/SerialPort.h"
+
 using namespace std;
 
 // 战术技术指标 Tactical Technical Indicators
@@ -194,10 +196,14 @@ public:
 	bool IsNavigationError;
 	bool IsRS422Start;
 private:
+	double p;
+	double i;
+	double d;
 	void DecodeData();
 	RS422DataPackage data;
 	bool disposed;
 	void DataInit();
+	CSerialPort serialPort;
 protected:
 	void RS422SendString(string strs);
 };
