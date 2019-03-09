@@ -100,13 +100,13 @@ SixDofPlatformStatus lastStartStatus = SIXDOF_STATUS_BOTTOM;
 
 #if PATH_DATA_USE_DDA
 
-MovingAverageFilterType rollFiter = {120, 1.0};
-MovingAverageFilterType yawFiter = {10, 1.0};
-MovingAverageFilterType pitchFiter = {40, 1.3};
+MovingAverageFilterType rollFiter = {200, 1.0};
+MovingAverageFilterType yawFiter = {200, 1.0};
+MovingAverageFilterType pitchFiter = {200, 1.3};
 
-MovingAverageFilterType xFiter = {20, 1.0};
-MovingAverageFilterType yFiter = {20, 1.0};
-MovingAverageFilterType zFiter = {20, 3.0};
+MovingAverageFilterType xFiter = {200, 1.0};
+MovingAverageFilterType yFiter = {200, 1.0};
+MovingAverageFilterType zFiter = {200, 3.0};
 double ShockVal = 0.1;
 double ShockHz = 8.0;
 
@@ -123,6 +123,13 @@ double ShockVal = 1.0;
 double ShockHz = 188.0;
 
 #endif
+
+kalman1_state kalman_rollFilter;
+kalman1_state kalman_yawFilter;
+kalman1_state kalman_pitchFilter;
+kalman1_state kalman_xFilter;
+kalman1_state kalman_yFilter;
+kalman1_state kalman_zFilter;
 
 double controlOut[FREEDOM_NUM];
 
@@ -284,7 +291,8 @@ void VisionDataDeal()
 {
 	vision.RenewVisionData();
 	//if (vision.IsRecievedData == false)
-	enableShock = vision.IsRecievedData;
+	//enableShock = vision.IsRecievedData;
+	enableShock = vision.GetIsShock();
 	return;
 	if (vision.RecieveState.IsConsoleInitial)
 	{
@@ -358,6 +366,12 @@ void SixdofControl()
 {
 	VisionDataDeal();
 	EnterCriticalSection(&csdata);
+	vision.X = kalman1_filter(&kalman_xFilter, vision.X);
+	vision.Y = kalman1_filter(&kalman_yFilter, vision.Y);
+	vision.Z = kalman1_filter(&kalman_zFilter, vision.Z);
+	vision.Roll = kalman1_filter(&kalman_rollFilter, vision.Roll);
+	vision.Pitch = kalman1_filter(&kalman_pitchFilter, vision.Pitch);
+	vision.Yaw = kalman1_filter(&kalman_yawFilter, vision.Yaw);
 	visionX = vision.X;
 	visionY = vision.Y;
 	visionZ = vision.Z;
@@ -539,7 +553,9 @@ void SixdofControl()
 
 #if PATH_DATA_USE_DDA
 							t += 0.00095;
+							EnterCriticalSection(&cs);
 							delta.SetDDAData(dis);
+							LeaveCriticalSection(&cs);
 #else
 							t += 0.01;
 							EnterCriticalSection(&cs);
@@ -658,6 +674,16 @@ BEGIN_MESSAGE_MAP(CECATSampleDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_TEST3, &CECATSampleDlg::OnBnClickedButtonTest3)
 	ON_BN_CLICKED(IDC_BUTTON_STOP_TEST, &CECATSampleDlg::OnBnClickedButtonStopTest)
 END_MESSAGE_MAP()
+
+void CECATSampleDlg::KalmanFilterInit()
+{
+	kalman1_init(&kalman_rollFilter, 0, 0.01);
+	kalman1_init(&kalman_yawFilter, 0, 0.01);
+	kalman1_init(&kalman_pitchFilter, 0, 0.01);
+	kalman1_init(&kalman_xFilter, 0, 0.01);
+	kalman1_init(&kalman_yFilter, 0, 0.01);
+	kalman1_init(&kalman_zFilter, 0, 0.01);
+}
 
 void CECATSampleDlg::ChartInit()
 {
@@ -819,6 +845,7 @@ void CECATSampleDlg::AppInit()
 	SetPlatformPara(PlaneAboveHingeLength, PlaneAboveBottomLength, 
 		CircleTopRadius, CircleBottomRadius, DistanceBetweenHingeTop,
 		DistanceBetweenHingeBottom);
+	KalmanFilterInit();
 	OpenThread();
 	vision.Open(VISION_PORT, VISION_BAUDRATE);
 }

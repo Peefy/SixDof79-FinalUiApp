@@ -25,6 +25,7 @@ public:
 	int PortNumber;
 	int BaudRate;
 	bool IsRecievedData;
+	bool IsNotConnect;
 	bool Open(int portNumber, int baudRate);
 	bool Close();
 	T GetDataFromCom();
@@ -32,6 +33,7 @@ public:
 private:
 	BaseCom();
 	CSerialPort serialPort;
+	int NotConnectCount;
 };
 
 template <typename T>
@@ -46,6 +48,8 @@ BaseCom<T>::BaseCom(uint8_t headerOne, uint8_t headerTwo)
 {
 	DefaultPackageHeaderOne = headerOne;
 	DefaultPackageHeaderTwo = headerTwo;
+	NotConnectCount = 0;
+	IsRecievedData = false;
 }
 
 template <typename T>
@@ -105,6 +109,11 @@ T BaseCom<T>::GetDataFromCom()
 		usRxLength -= length;
 		memcpy(&chrTemp[0], &chrTemp[length], usRxLength);    
 		IsRecievedData = true;
+	}
+	if (++NotConnectCount > 20)
+	{
+		NotConnectCount = 0;
+		IsRecievedData = false;
 	}
 	return Data;
 }

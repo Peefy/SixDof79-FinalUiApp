@@ -174,7 +174,7 @@ void LandVision::SendVisionData()
 
 bool LandVision::GetIsShock()
 {
-	bool enableShock = false;
+	bool enableShock = true;
 	if (RecieveState.IsShockOff == true)
 	{
 		enableShock = false;
