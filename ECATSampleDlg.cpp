@@ -421,6 +421,7 @@ void SixdofControl()
 							double pitch = 0;
 							double yaw = 0;
 							double stopTime = 0;
+							// 开始正弦运动时加一个chrip信号缓冲
 							if (t <= chirpTime && enableChirp == true)
 							{
 								for (auto i = 0; i < AXES_COUNT; ++i)
