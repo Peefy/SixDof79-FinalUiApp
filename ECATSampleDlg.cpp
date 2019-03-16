@@ -362,6 +362,7 @@ void VisionDataDeal()
 
 void SixdofControl()
 {
+	static double deltat = 0.00095;
 	VisionDataDeal();
 	EnterCriticalSection(&csdata);
 	vision.X = kalman1_filter(&kalman_xFilter, vision.X);
@@ -495,7 +496,7 @@ void SixdofControl()
 								auto pulse = pulse_cal[ii];
 								dis[ii] = (int)pulse;
 							}
-							t += 0.00095;
+							t += deltat;
 							if (stopSCurve == true && isCosMode == false)
 							{
 								int index = 0;
@@ -517,7 +518,7 @@ void SixdofControl()
 							}	
 							else if (nowt > stopTime)
 							{
-								t -= 0.00095;
+								t -= deltat;
 							}
 						}
 						// 视景姿态模拟运动
