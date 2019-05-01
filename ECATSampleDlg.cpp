@@ -360,6 +360,9 @@ void VisionDataDeal()
 	}
 }
 
+bool shockedFinished = false;
+int shockedCount = 0;
+
 void SixdofControl()
 {
 	static double deltat = 0.00095;
@@ -379,6 +382,18 @@ void SixdofControl()
 	visionYaw = vision.Yaw;
 	LeaveCriticalSection(&csdata);
 	Sleep(10);
+	if (vision.IsRecievedData == true){
+		if (++shockedCount > 30)
+		{
+			shockedCount = 30;
+		}
+	}
+	else{
+		if (--shockedCount < 0)
+		{
+			shockedCount = 0;
+		}
+	}
 	if (closeDataThread == false)
 	{	
 		U16 upCount = DDA_UP_COUNT;
