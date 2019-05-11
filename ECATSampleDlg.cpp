@@ -66,6 +66,9 @@ using namespace std;
 #define ENABLE_CHIRP  true
 #define ENABLE_SHOCK  true
 
+#define DEFAULT_SHOCK_VAL 0.3
+#define DEFAULT_SHOCK_HZ  8
+
 #define PATH_DATA_USE_DDA 0
 
 bool enableShock = ENABLE_SHOCK;
@@ -123,6 +126,9 @@ double ShockVal = 1.0;
 double ShockHz = 188.0;
 
 #endif
+
+int shockedCount = 0;
+int shockedUpCount = 60;
 
 kalman1_state kalman_rollFilter;
 kalman1_state kalman_yawFilter;
@@ -289,79 +295,9 @@ void SensorRead()
 
 void VisionDataDeal()
 {
-	vision.RenewVisionData();
+	vision.GatherDataFromCom();
 	enableShock = vision.IsRecievedData;
-	return;
-	if (vision.RecieveState.IsConsoleInitial)
-	{
-		if (status == SIXDOF_STATUS_BOTTOM)
-		{
-			delta.DownUsingHomeMode();
-			Sleep(100);
-			delta.ReadAllSwitchStatus();
-			Sleep(50);
-			if (delta.IsAllAtBottom() == false)
-			{
-				return;
-			}	
-			status = SIXDOF_STATUS_ISRISING;	
-			delta.ResetStatus();
-			auto more_time_count = 10;
-			for (auto i = 0;i < more_time_count; ++i)
-			{
-				delta.ResetAlarm();
-				Sleep(50);
-			}
-			delta.Rise();
-			Sleep(50);
-			Sleep(4000);
-			status = SIXDOF_STATUS_RUN;
-			delta.RenewNowPulse();
-			delta.ResetStatus();
-			delta.GetMotionAveragePulse();
-			isTest = false;
-			sin_time_pulse = 0;
-			t = 0;
-			dataChartTime = 0;
-			closeDataThread = false;
-			isStart = true;	
-		}
-		if (status == SIXDOF_STATUS_READY)
-		{
-			status = SIXDOF_STATUS_RUN;
-			delta.RenewNowPulse();
-			delta.ResetStatus();
-			delta.GetMotionAveragePulse();
-			isTest = false;
-			sin_time_pulse = 0;
-			t = 0;
-			dataChartTime = 0;
-			closeDataThread = false;
-			isStart = true;	
-		}
-	}
-	if (vision.RecieveState.IsConsoleZero)
-	{
-		if (status == SIXDOF_STATUS_RUN)
-		{
-			stopSCurve = true;
-			closeDataThread = true;
-			delta.MoveToZeroPulseNumber();
-			status = SIXDOF_STATUS_READY;
-			ResetDefaultData(&data);
-		}
-	}
-	enableShock = vision.GetIsShock();
-	//ShockHz = vision.GetShockHzFromRoadType();
-	//ShockVal = vision.GetShockValFromRoadType();
-	if (vision.RecieveState.GetFunction(7) == true)
-	{
-		vision.SendVisionData();
-	}
 }
-
-bool shockedFinished = false;
-int shockedCount = 0;
 
 void SixdofControl()
 {
@@ -382,17 +318,15 @@ void SixdofControl()
 	visionYaw = vision.Yaw;
 	LeaveCriticalSection(&csdata);
 	Sleep(10);
+
 	if (vision.IsRecievedData == true){
-		if (++shockedCount > 30)
+		if (++shockedCount > shockedUpCount)
 		{
-			shockedCount = 30;
+			shockedCount = shockedUpCount;
 		}
 	}
 	else{
-		if (--shockedCount < 0)
-		{
-			shockedCount = 0;
-		}
+		shockedCount = 0;
 	}
 	if (closeDataThread == false)
 	{	
@@ -1180,6 +1114,26 @@ void CECATSampleDlg::EanbleButton(int isenable)
 	GetDlgItem(IDC_BUTTON_STOP_TEST)->EnableWindow(isenable);
 }
 
+void CECATSampleDlg::SelectStartMode()
+{
+	if (shockedCount > 0 && shockedCount < shockedUpCount)
+	{
+		StopWithoutDelay();
+		Sleep(200);
+		RunShockMode();
+	}
+	else if(shockedCount == shockedUpCount)
+	{
+		StopWithoutDelay();
+		Sleep(200);
+		OnBnClickedBtnStart();
+	}
+	else
+	{
+		//StopWithoutDelay();
+	}
+}
+
 void CECATSampleDlg::OnTimer(UINT nIDEvent) 
 {
 	I16 rt;
@@ -1193,10 +1147,11 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	}
 	MoveValPoint();
 	RenderScene();
+	SelectStartMode();
 	//RenderSwitchStatus();
 	//ShowImage();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
-		data.Yaw, data.Pitch, data.Roll, runTime, Counter);
+		data.Yaw, data.Pitch, data.Roll, runTime, shockedCount);
 	SetDlgItemText(IDC_EDIT_Pose, statusStr);
 
 	statusStr.Format(_T("1:%.2f 2:%.2f 3:%.2f 4:%.2f 5:%.2f 6:%.2f"), 
@@ -1388,6 +1343,28 @@ void CECATSampleDlg::OnBnClickedBtnStopme()
 	ResetDefaultData(&data);
 }
 
+void CECATSampleDlg::StopWithoutDelay()
+{
+	closeDataThread = true;
+	delta.ServoStop();
+	Sleep(50);
+	delta.DisableDDA();
+	delta.ServoAllOnOff(true);
+	if (status == SIXDOF_STATUS_RUN)
+	{
+		if (stopAndMiddle == true)
+		{
+			delta.MoveToZeroPulseNumber();
+			status = SIXDOF_STATUS_READY;
+		}
+		else
+		{
+			status = SIXDOF_STATUS_MIDDLE;
+		}
+	}
+	ResetDefaultData(&data);
+}
+
 void CECATSampleDlg::OnBnClickedBtnDown()
 {	
 	if(status == SIXDOF_STATUS_BOTTOM)
@@ -1526,6 +1503,38 @@ void CECATSampleDlg::RunTestMode()
 	sprintf_s(fileName, "./datas/pathdata%d-%d-%d-%d-%d-%d.txt", p->tm_year + 1990, p->tm_mon + 1,
 		p->tm_mday, p->tm_hour + 8, p->tm_min, p->tm_sec);
 
+	closeDataThread = false;
+	isStart = true;
+}
+
+void CECATSampleDlg::RunShockMode()
+{
+	if (status != SIXDOF_STATUS_READY)
+	{
+		return;
+	}
+	status = SIXDOF_STATUS_RUN;
+	memset(testVal, 0, sizeof(double) * AXES_COUNT);
+	memset(testHz, 0, sizeof(double) * AXES_COUNT);
+	memset(testPhase, 0, sizeof(double) * AXES_COUNT);
+	testVal[2] = DEFAULT_SHOCK_VAL;
+	testHz[2] = DEFAULT_SHOCK_HZ;
+	enableChirp = ENABLE_CHIRP;
+	isCosMode = false;
+	stopSCurve = false;
+	isCsp = false;
+	if (isCsp == false)
+	{
+		delta.EnableDDA();
+	}
+	delta.ServoStop();
+	Sleep(100);
+	delta.RenewNowPulse();
+	delta.ResetStatus();
+	delta.GetMotionAveragePulse();
+	isTest = true;
+	t = 0;
+	dataChartTime = 0;
 	closeDataThread = false;
 	isStart = true;
 }

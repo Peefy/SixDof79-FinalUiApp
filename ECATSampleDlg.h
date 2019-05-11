@@ -78,12 +78,15 @@ public:
 	afx_msg void OnBnClickedBtnStart();
 	afx_msg void OnBnClickedBtnStopme();
 	afx_msg void OnBnClickedBtnDown();
+	void SelectStartMode();
+	void StopWithoutDelay();
 	void EanbleButton(int isenable);
 	void SixdofPlatformInit();
 	void KalmanFilterInit();
 	void ChartInit();
 	void AppInit();
 	void RunTestMode();
+	void RunShockMode();
 	double GetCEditNumber(int cEditId);
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedBtnConnect();
