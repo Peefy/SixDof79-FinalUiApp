@@ -87,6 +87,7 @@ public:
 	void AppInit();
 	void RunTestMode();
 	void RunShockMode();
+	void RunStartMode();
 	double GetCEditNumber(int cEditId);
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedBtnConnect();

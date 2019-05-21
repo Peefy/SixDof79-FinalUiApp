@@ -318,15 +318,19 @@ void SixdofControl()
 	visionYaw = vision.Yaw;
 	LeaveCriticalSection(&csdata);
 	Sleep(10);
-
-	if (vision.IsRecievedData == true){
-		if (++shockedCount > shockedUpCount)
-		{
-			shockedCount = shockedUpCount;
+	if (status == SIXDOF_STATUS_READY ||
+		status == SIXDOF_STATUS_RUN || 
+		status == SIXDOF_STATUS_RUN_SHOCK_MODE ||
+		status == SIXDOF_STATUS_RUN_START_MODE){
+		if (vision.IsRecievedData == true){
+			if (++shockedCount > shockedUpCount)
+			{
+				shockedCount = shockedUpCount;
+			}
 		}
-	}
-	else{
-		shockedCount = 0;
+		else{
+			shockedCount = 0;
+		}
 	}
 	if (closeDataThread == false)
 	{	
@@ -1118,19 +1122,24 @@ void CECATSampleDlg::SelectStartMode()
 {
 	if (shockedCount > 0 && shockedCount < shockedUpCount)
 	{
-		StopWithoutDelay();
-		Sleep(200);
 		RunShockMode();
 	}
 	else if(shockedCount == shockedUpCount)
 	{
-		StopWithoutDelay();
-		Sleep(200);
-		OnBnClickedBtnStart();
+		if (status == SIXDOF_STATUS_RUN_SHOCK_MODE)
+		{
+			StopWithoutDelay();
+		}
+		RunStartMode();
 	}
 	else
 	{
-		//StopWithoutDelay();
+
+		if (status == SIXDOF_STATUS_RUN_SHOCK_MODE
+			|| status == SIXDOF_STATUS_RUN_START_MODE)
+		{
+			StopWithoutDelay();
+		}
 	}
 }
 
@@ -1328,7 +1337,9 @@ void CECATSampleDlg::OnBnClickedBtnStopme()
 	Sleep(100);
 	delta.DisableDDA();
 	delta.ServoAllOnOff(true);
-	if (status == SIXDOF_STATUS_RUN)
+	if (status == SIXDOF_STATUS_RUN || 
+		status == SIXDOF_STATUS_RUN_SHOCK_MODE ||
+		status == SIXDOF_STATUS_RUN_START_MODE)
 	{
 		if (stopAndMiddle == true)
 		{
@@ -1350,7 +1361,9 @@ void CECATSampleDlg::StopWithoutDelay()
 	Sleep(50);
 	delta.DisableDDA();
 	delta.ServoAllOnOff(true);
-	if (status == SIXDOF_STATUS_RUN)
+	if (status == SIXDOF_STATUS_RUN ||
+		status == SIXDOF_STATUS_RUN_SHOCK_MODE ||
+		status == SIXDOF_STATUS_RUN_START_MODE)
 	{
 		if (stopAndMiddle == true)
 		{
@@ -1513,7 +1526,40 @@ void CECATSampleDlg::RunShockMode()
 	{
 		return;
 	}
-	status = SIXDOF_STATUS_RUN;
+	StopWithoutDelay();
+	status = SIXDOF_STATUS_RUN_SHOCK_MODE;
+	memset(testVal, 0, sizeof(double) * AXES_COUNT);
+	memset(testHz, 0, sizeof(double) * AXES_COUNT);
+	memset(testPhase, 0, sizeof(double) * AXES_COUNT);
+	testVal[2] = DEFAULT_SHOCK_VAL;
+	testHz[2] = DEFAULT_SHOCK_HZ;
+	enableChirp = ENABLE_CHIRP;
+	isCosMode = false;
+	stopSCurve = false;
+	isCsp = false;
+	if (isCsp == false)
+	{
+		delta.EnableDDA();
+	}
+	delta.ServoStop();
+	Sleep(100);
+	delta.RenewNowPulse();
+	delta.ResetStatus();
+	delta.GetMotionAveragePulse();
+	isTest = true;
+	t = 0;
+	dataChartTime = 0;
+	closeDataThread = false;
+	isStart = true;
+}
+
+void CECATSampleDlg::RunStartMode()
+{
+	if (status != SIXDOF_STATUS_READY)
+	{
+		return;
+	}
+	status = SIXDOF_STATUS_RUN_START_MODE;
 	memset(testVal, 0, sizeof(double) * AXES_COUNT);
 	memset(testHz, 0, sizeof(double) * AXES_COUNT);
 	memset(testPhase, 0, sizeof(double) * AXES_COUNT);
