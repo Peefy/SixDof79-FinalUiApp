@@ -1134,7 +1134,6 @@ void CECATSampleDlg::SelectStartMode()
 	}
 	else
 	{
-
 		if (status == SIXDOF_STATUS_RUN_SHOCK_MODE
 			|| status == SIXDOF_STATUS_RUN_START_MODE)
 		{
