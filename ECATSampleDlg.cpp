@@ -1155,7 +1155,7 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	}
 	MoveValPoint();
 	RenderScene();
-	SelectStartMode();
+	//SelectStartMode();
 	//RenderSwitchStatus();
 	//ShowImage();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
