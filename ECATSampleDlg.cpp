@@ -317,20 +317,6 @@ void SixdofControl()
 	visionYaw = vision.Yaw;
 	LeaveCriticalSection(&csdata);
 	Sleep(10);
-	if (status == SIXDOF_STATUS_READY ||
-		status == SIXDOF_STATUS_RUN || 
-		status == SIXDOF_STATUS_RUN_SHOCK_MODE ||
-		status == SIXDOF_STATUS_RUN_START_MODE){
-		if (vision.IsRecievedData == true){
-			if (++shockedCount > shockedUpCount)
-			{
-				shockedCount = shockedUpCount;
-			}
-		}
-		else{
-			shockedCount = 0;
-		}
-	}
 	if (closeDataThread == false)
 	{	
 		U16 upCount = DDA_UP_COUNT;
