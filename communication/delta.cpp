@@ -550,6 +550,7 @@ bool MotionControl::CheckStatus(SixDofPlatformStatus& status)
 			{
 				status = SIXDOF_STATUS_READY;
 			}	
+			SIXDOF_STATUS_READY;
 			break;
 		case SIXDOF_STATUS_ISFALLING:
 			str = "isfalling";			

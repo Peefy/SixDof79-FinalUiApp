@@ -1173,9 +1173,9 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	LeaveCriticalSection(&csdata);
 
 	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
-	EnterCriticalSection(&cs);
+	//EnterCriticalSection(&cs);
 	delta.CheckStatus(status);
-	LeaveCriticalSection(&cs);
+	//LeaveCriticalSection(&cs);
 	if(InitialFlag == 0)
 	{
 		EanbleButton(0);
