@@ -544,12 +544,7 @@ bool MotionControl::CheckStatus(SixDofPlatformStatus& status)
 			str = "run";
 			break;
 		case SIXDOF_STATUS_ISRISING:
-			str = "isrising";
-			pulse = GetMotionAveragePulse();
-			if (pulse >= (RISE_RPM / 2.0) * PULSE_PER_R)
-			{
-				status = SIXDOF_STATUS_READY;
-			}	
+			str = "isr¡¤ising";
 			SIXDOF_STATUS_READY;
 			break;
 		case SIXDOF_STATUS_ISFALLING:

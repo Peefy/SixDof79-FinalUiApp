@@ -772,6 +772,13 @@ void CECATSampleDlg::AppInit()
 	CFont* font = new CFont();
 	font->CreatePointFont(APP_TITLE_FONT_SIZE, _T("Times New Roman"));
 	GetDlgItem(IDC_STATIC_APP_TITLE)->SetFont(font);
+
+#ifdef _DEBUG
+	GetDlgItem(IDC_BUTTON_VISIBLE_TEST)->ShowWindow(SW_SHOW);
+#else
+	GetDlgItem(IDC_BUTTON_VISIBLE_TEST)->ShowWindow(SW_HIDE);
+#endif
+
 	ChartInit();
 	for (auto i = 1; i <= AXES_COUNT; ++i)
 	{
@@ -1283,7 +1290,7 @@ void CECATSampleDlg::OnBnClickedBtnStart()
 		MessageBox(_T(SIXDOF_NOT_RECIEVE_BEGIN_MESSAGE));
 		return;
 	}
-	if (status != SIXDOF_STATUS_READY)
+	if (status != SIXDOF_STATUS_READY && status != SIXDOF_STATUS_ISRISING)
 	{
 		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
 		return;
@@ -1366,11 +1373,6 @@ void CECATSampleDlg::OnBnClickedBtnDown()
 {	
 	if(status == SIXDOF_STATUS_BOTTOM)
 	{
-		return;
-	}
-	if (status != SIXDOF_STATUS_READY)
-	{
-		MessageBox(_T(SIXDOF_NOT_FALLING_MESSAGE));
 		return;
 	}
 	delta.ServoStop();
@@ -1571,7 +1573,7 @@ void CECATSampleDlg::RunStartMode()
 
 void CECATSampleDlg::OnBnClickedButtonTest()
 {
-	if (status != SIXDOF_STATUS_READY)
+	if (status != SIXDOF_STATUS_READY && status != SIXDOF_STATUS_ISRISING)
 	{
 		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
 		return;

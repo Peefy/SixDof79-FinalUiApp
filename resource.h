@@ -36,6 +36,7 @@
 #define IDC_STATIC_SHOW_INIT            1022
 #define IDC_EDIT_MC                     1023
 #define IDC_BUTTON_TEST3                1023
+#define IDC_BUTTON_VISIBLE_TEST         1023
 #define IDC_STATIC_SENSOR2              1024
 #define IDC_STATIC_APP_TITLE            1024
 #define IDC_CHK_SVON                    1025
