@@ -39,6 +39,7 @@
 
 #define IDC_STATIC_TEST_SHOW_TEXT      "测试(位移单位:1mm, 角度单位:1°, 频率单位:1Hz, 相位单位:1°)"
 #define IDC_BUTTON_TEST_SHOW_TEXT      "运行测试"
+#define IDC_STATIC_ZERO_SHOW_TEXT      "零位调整"
 
 #define CORPORATION_NAME "北京市星光凯明动感仿真模拟器中心"
 
@@ -67,5 +68,11 @@
 #define IDC_STATIC_PLATFORM_SHOW_TEXT        "六自由度平台状态"
 #define IDC_STATIC_SWITCH_STATUS_SHOW_TEXT   "接近开关"
 #define IDC_STATIC_POLE_LENGTH_SHOW_TEXT     "缸伸长量(mm)"
+
+#define IDC_BUTTON_ROLL_ZERO_ADD_SHOW_TEXT      "侧倾微调+"
+#define IDC_BUTTON_ROLL_ZERO_SUB_SHOW_TEXT	    "侧倾微调-"
+#define IDC_BUTTON_PITCH_ZERO_ADD_SHOW_TEXT     "俯仰微调+"
+#define IDC_BUTTON_PITCH_ZERO_SUB_SHOW_TEXT	    "俯仰微调-"
+
 
 #endif

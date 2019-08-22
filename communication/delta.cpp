@@ -309,6 +309,14 @@ void MotionControl::Csp(I32 * pulse)
 	}
 }
 
+void MotionControl::MoveTo(I32 * pulse)
+{
+	I32 targetPulse[AXES_NUM] = {0};
+	memcpy(targetPulse, pulse, sizeof(I32) * AXES_NUM);
+	auto status = _ECAT_Slave_CSP_Start_Multiaxes_Move(this->CardNo, AXES_NUM, this->NodeId, this->SlotId,
+		targetPulse, 0, DOWN_VEL, 0, 0.1, 0.1, 2, 1);
+}
+
 void MotionControl::Rise()
 {
 	I32 RiseTargetPulse[AXES_NUM];

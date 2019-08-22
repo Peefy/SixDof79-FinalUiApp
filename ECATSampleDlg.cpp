@@ -63,6 +63,7 @@ using namespace std;
 #define DDA_ONCE_COUNT  100
 
 #define CHIRP_TIME    2.5
+#define ZERO_POS_TIME 2.5
 #define ENABLE_CHIRP  true
 #define ENABLE_SHOCK  true
 
@@ -73,6 +74,7 @@ using namespace std;
 
 bool enableShock = ENABLE_SHOCK;
 bool enableChirp = ENABLE_CHIRP;
+bool enableZeroPos = true;
 bool stopSCurve = false;
 
 void SixdofControl();
@@ -189,6 +191,16 @@ double visionZ;
 double visionRoll;
 double visionPitch;
 double visionYaw;
+
+double rolloffset = 0;
+double pitchoffset = 0;
+double offsetstep = 0.01;
+
+bool isHasOffset()
+{
+	bool re = rolloffset != 0 || pitchoffset != 0;
+	return re;
+}
 
 DWORD WINAPI DataTransThread(LPVOID pParam)
 {
@@ -351,6 +363,7 @@ void SixdofControl()
 						{
 							double nowHz[AXES_COUNT] = {testHz[0], testHz[1], testHz[2], testHz[3], testHz[4], testHz[5]};
 							double chirpTime = CHIRP_TIME;
+							double zeroposTime = ZERO_POS_TIME;
 							double pi = 3.1415926;
 							double nowt = t;
 							double x = 0;
@@ -418,6 +431,16 @@ void SixdofControl()
 								roll = sin(2 * pi * nowHz[3] * nowphase_t[3]) * testVal[3];
 								pitch = sin(2 * pi * nowHz[4] * nowphase_t[4]) * testVal[4];
 								yaw = sin(2 * pi * nowHz[5] * nowphase_t[5]) * testVal[5];
+							}
+							if (enableZeroPos == true)
+							{
+								auto minZeroPosTime = min(t, zeroposTime) / zeroposTime;
+								x += 0 * minZeroPosTime;
+								y += 0 * minZeroPosTime;
+								z += 0 * minZeroPosTime;
+								roll += rolloffset * minZeroPosTime;
+								pitch += pitchoffset * minZeroPosTime;
+								yaw += 0 * minZeroPosTime;
 							}
 							data.X = (int16_t)(x * 10);
 							data.Y = (int16_t)(y * 10);
@@ -611,6 +634,10 @@ BEGIN_MESSAGE_MAP(CECATSampleDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_EXIT, &CECATSampleDlg::OnBnClickedButtonExit)
 	ON_BN_CLICKED(IDC_BUTTON_TEST3, &CECATSampleDlg::OnBnClickedButtonTest3)
 	ON_BN_CLICKED(IDC_BUTTON_STOP_TEST, &CECATSampleDlg::OnBnClickedButtonStopTest)
+	ON_BN_CLICKED(IDC_BUTTON_ROLL_ZERO_ADD, &CECATSampleDlg::OnBnClickedButtonRollZeroAdd)
+	ON_BN_CLICKED(IDC_BUTTON_ROLL_ZERO_SUB, &CECATSampleDlg::OnBnClickedButtonRollZeroSub)
+	ON_BN_CLICKED(IDC_BUTTON_PITCH_ZERO_ADD, &CECATSampleDlg::OnBnClickedButtonPitchZeroAdd)
+	ON_BN_CLICKED(IDC_BUTTON_PITCH_ZERO_SUB, &CECATSampleDlg::OnBnClickedButtonPitchZeroSub)
 END_MESSAGE_MAP()
 
 void CECATSampleDlg::KalmanFilterInit()
@@ -762,10 +789,16 @@ void CECATSampleDlg::AppInit()
 
 	GetDlgItem(IDC_STATIC_TEST)->SetWindowTextW(_T(IDC_STATIC_TEST_SHOW_TEXT));
 	GetDlgItem(IDC_BUTTON_TEST)->SetWindowTextW(_T(IDC_BUTTON_TEST_SHOW_TEXT));
+	GetDlgItem(IDC_STATIC_ZERO)->SetWindowTextW(_T(IDC_STATIC_ZERO_SHOW_TEXT));
 
 	GetDlgItem(IDC_STATIC_PLATFORM)->SetWindowTextW(_T(IDC_STATIC_PLATFORM_SHOW_TEXT));
 	GetDlgItem(IDC_STATIC_SWITCH_STATUS)->SetWindowTextW(_T(IDC_STATIC_SWITCH_STATUS_SHOW_TEXT));
 	GetDlgItem(IDC_STATIC_POLE_LENGTH)->SetWindowTextW(_T(IDC_STATIC_POLE_LENGTH_SHOW_TEXT));
+
+	GetDlgItem(IDC_BUTTON_ROLL_ZERO_ADD)->SetWindowTextW(_T(IDC_BUTTON_ROLL_ZERO_ADD_SHOW_TEXT));
+	GetDlgItem(IDC_BUTTON_ROLL_ZERO_SUB)->SetWindowTextW(_T(IDC_BUTTON_ROLL_ZERO_SUB_SHOW_TEXT));
+	GetDlgItem(IDC_BUTTON_PITCH_ZERO_ADD)->SetWindowTextW(_T(IDC_BUTTON_PITCH_ZERO_ADD_SHOW_TEXT));
+	GetDlgItem(IDC_BUTTON_PITCH_ZERO_SUB)->SetWindowTextW(_T(IDC_BUTTON_PITCH_ZERO_SUB_SHOW_TEXT));
 
 	GetDlgItem(IDC_STATIC_APP_STATUS)->SetWindowTextW(_T(CORPORATION_NAME));
 	GetDlgItem(IDC_STATIC_APP_TITLE)->SetWindowTextW(_T(APP_TITLE));
@@ -1108,6 +1141,17 @@ void CECATSampleDlg::EanbleButton(int isenable)
 	GetDlgItem(IDC_BTN_Resetme)->EnableWindow(isenable);
 	GetDlgItem(IDC_BUTTON_TEST)->EnableWindow(isenable);
 	GetDlgItem(IDC_BUTTON_STOP_TEST)->EnableWindow(isenable);
+#ifdef _DEBUG
+	GetDlgItem(IDC_BUTTON_ROLL_ZERO_ADD)->EnableWindow(1);
+	GetDlgItem(IDC_BUTTON_ROLL_ZERO_SUB)->EnableWindow(1);
+	GetDlgItem(IDC_BUTTON_PITCH_ZERO_ADD)->EnableWindow(1);
+	GetDlgItem(IDC_BUTTON_PITCH_ZERO_SUB)->EnableWindow(1);
+#else
+	GetDlgItem(IDC_BUTTON_ROLL_ZERO_ADD)->EnableWindow(isenable);
+	GetDlgItem(IDC_BUTTON_ROLL_ZERO_SUB)->EnableWindow(isenable);
+	GetDlgItem(IDC_BUTTON_PITCH_ZERO_ADD)->EnableWindow(isenable);
+	GetDlgItem(IDC_BUTTON_PITCH_ZERO_SUB)->EnableWindow(isenable);
+#endif
 }
 
 void CECATSampleDlg::SelectStartMode()
@@ -1152,19 +1196,26 @@ void CECATSampleDlg::OnTimer(UINT nIDEvent)
 	//ShowImage();
 	statusStr.Format(_T("x:%d y:%d z:%d y:%d a:%d b:%d time:%.2f count:%d"), data.X, data.Y, data.Z,
 		data.Yaw, data.Pitch, data.Roll, runTime, shockedCount);
-	SetDlgItemText(IDC_EDIT_Pose, statusStr);
+	SetDlgItemText(IDC_EDIT_POSE_AND_TIME, statusStr);
 
 	statusStr.Format(_T("1:%.2f 2:%.2f 3:%.2f 4:%.2f 5:%.2f 6:%.2f"), 
 		poleLength[0], poleLength[1], poleLength[2],
 		poleLength[3], poleLength[4], poleLength[5]);
 	SetDlgItemText(IDC_EDIT_Pulse, statusStr);
+
 	EnterCriticalSection(&csdata);
 	statusStr.Format(_T("1:%.2f 2:%.2f 3:%.2f 4:%.2f 5:%.2f 6:%.2f"),
 		visionX, visionY, visionZ,
 		visionRoll, visionPitch, visionYaw);
 	LeaveCriticalSection(&csdata);
-
 	SetDlgItemText(IDC_EDIT_Sensor, statusStr);
+
+	statusStr.Format(_T("%.2f"), rolloffset);
+	SetDlgItemText(IDC_EDIT_ZERO_ROLL, statusStr);
+
+	statusStr.Format(_T("%.2f"), pitchoffset);
+	SetDlgItemText(IDC_EDIT_ZERO_PITCH, statusStr);
+
 	//EnterCriticalSection(&cs);
 	delta.CheckStatus(status);
 	//LeaveCriticalSection(&cs);
@@ -1343,6 +1394,7 @@ void CECATSampleDlg::OnBnClickedBtnStopme()
 		}
 	}
 	ResetDefaultData(&data);
+	pitchoffset = 0; rolloffset = 0;
 }
 
 void CECATSampleDlg::StopWithoutDelay()
@@ -1489,7 +1541,12 @@ void CECATSampleDlg::RunTestMode()
 		delta.EnableDDA();
 	}
 	delta.ServoStop();
-	Sleep(100);
+	Sleep(20);
+	if (isHasOffset() == true)
+	{
+		delta.MoveToZeroPulseNumber();
+		Sleep(100);
+	}
 	delta.RenewNowPulse();
 	delta.ResetStatus();
 	delta.GetMotionAveragePulse();
@@ -1595,4 +1652,102 @@ void CECATSampleDlg::OnBnClickedButtonTest3()
 void CECATSampleDlg::OnBnClickedButtonStopTest()
 {
 	OnBnClickedBtnStopme();
+}
+
+void RunOffset()
+{
+	double* pulse_dugu = Control(0, 0, 0, rolloffset, 0, pitchoffset);
+	I32 dis[AXES_COUNT] = {0, 0, 0, 0, 0, 0};
+	for (auto ii = 0; ii < AXES_COUNT; ++ii)
+	{
+		poleLength[ii] = pulse_dugu[ii];
+		pulse_cal[ii] = pulse_dugu[ii];
+		pulse_cal[ii] *= LENGTH_TO_PULSE_SCALE;
+		auto pulse = pulse_cal[ii];
+		dis[ii] = (int)pulse;
+	}
+	Sleep(20);
+	delta.MoveTo(dis);
+}
+
+void CECATSampleDlg::OnBnClickedButtonRollZeroAdd()
+{
+#if _DEBUG
+#else
+	if (status != SIXDOF_STATUS_READY && status != SIXDOF_STATUS_ISRISING)
+	{
+		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
+		return;
+	}
+#endif
+	if (isHasOffset() == false)
+	{
+		delta.RenewNowPulse();
+		delta.ResetStatus();
+		delta.GetMotionAveragePulse();
+	}
+	rolloffset += offsetstep;
+	RunOffset();
+}
+
+void CECATSampleDlg::OnBnClickedButtonRollZeroSub()
+{
+#if _DEBUG
+#else
+	if (status != SIXDOF_STATUS_READY && status != SIXDOF_STATUS_ISRISING)
+	{
+		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
+		return;
+	}
+#endif
+	if (isHasOffset() == false)
+	{
+		delta.RenewNowPulse();
+		delta.ResetStatus();
+		delta.GetMotionAveragePulse();
+	}
+	rolloffset -= offsetstep;
+	RunOffset();
+}
+
+
+void CECATSampleDlg::OnBnClickedButtonPitchZeroAdd()
+{
+#if _DEBUG
+#else
+	if (status != SIXDOF_STATUS_READY && status != SIXDOF_STATUS_ISRISING)
+	{
+		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
+		return;
+	}
+#endif
+	if (isHasOffset() == false)
+	{
+		delta.RenewNowPulse();
+		delta.ResetStatus();
+		delta.GetMotionAveragePulse();
+	}
+	pitchoffset += offsetstep;
+	RunOffset();
+}
+
+
+void CECATSampleDlg::OnBnClickedButtonPitchZeroSub()
+{
+#if _DEBUG
+#else
+	if (status != SIXDOF_STATUS_READY && status != SIXDOF_STATUS_ISRISING)
+	{
+		MessageBox(_T(SIXDOF_NOT_BEGIN_MESSAGE));
+		return;
+	}
+#endif
+	if (isHasOffset() == false)
+	{
+		delta.RenewNowPulse();
+		delta.ResetStatus();
+		delta.GetMotionAveragePulse();
+	}
+	pitchoffset -= offsetstep;
+	RunOffset();
 }

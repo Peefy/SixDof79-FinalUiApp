@@ -103,11 +103,15 @@
 #define IDC_STATIC_PIC_POLE3            1072
 #define IDC_STATIC_PIC_POLE4            1073
 #define IDC_STATIC_PIC_POLE5            1074
+#define IDC_STATIC_ZERO                 1075
+#define IDC_BUTTON_ROLL_ZERO_ADD        1076
 #define IDC_BTN_PMove                   1077
+#define IDC_BUTTON_ROLL_ZERO_SUB        1077
 #define IDC_BTN_RALM                    1078
 #define IDC_STATIC_PIC_POLE9            1078
 #define IDC_STATIC_PIC_POLE6            1078
 #define IDC_BTN_MMove                   1079
+#define IDC_BUTTON_PITCH_ZERO_ADD       1079
 #define IDC_BTN_MMove2                  1080
 #define IDC_BTN_Rise                    1080
 #define IDC_BTN_Middle                  1081
@@ -119,10 +123,15 @@
 #define IDC_BTN_Resetme                 1086
 #define IDC_EDIT_InitialStatus2         1087
 #define IDC_EDIT_Pose                   1087
+#define IDC_EDIT_ZERO_ROLL              1087
 #define IDC_EDIT_Pose2                  1088
 #define IDC_EDIT_Pulse                  1088
 #define IDC_EDIT_RC                     1088
 #define IDC_EDIT_Sensor                 1089
+#define IDC_BUTTON_PITCH_ZERO_SUB       1090
+#define IDC_EDIT_Pose3                  1091
+#define IDC_EDIT_POSE_AND_TIME          1091
+#define IDC_EDIT_ZERO_PITCH             1093
 
 // Next default values for new objects
 // 

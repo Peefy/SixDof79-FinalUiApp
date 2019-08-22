@@ -58,6 +58,7 @@ public:
 	bool ResetAlarm();
 	bool ResetStatus();
 	void Csp(I32 * pulse);
+	void MoveTo(I32 * pulse);
 	void Rise();
 	void RiseWithSingle();
 	void Middle();

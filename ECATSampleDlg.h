@@ -100,6 +100,10 @@ public:
 	afx_msg void OnBnClickedButtonExit();
 	afx_msg void OnBnClickedButtonTest3();
 	afx_msg void OnBnClickedButtonStopTest();
+	afx_msg void OnBnClickedButtonRollZeroAdd();
+	afx_msg void OnBnClickedButtonRollZeroSub();
+	afx_msg void OnBnClickedButtonPitchZeroAdd();
+	afx_msg void OnBnClickedButtonPitchZeroSub();
 };
 
 //{{AFX_INSERT_LOCATION}}
