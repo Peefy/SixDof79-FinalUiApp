@@ -55,7 +55,7 @@ typedef enum
 #pragma pack (1)
 typedef struct 
 {
-	// 起始字符
+	// 起始字符 
 	uint8_t Header;
 	// 单位0.1mm
 	int16_t X;

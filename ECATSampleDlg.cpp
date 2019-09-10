@@ -307,7 +307,7 @@ void SensorRead()
 
 void VisionDataDeal()
 {
-	vision.GatherDataFromCom();
+	vision.GetDataFromCom();
 	enableShock = vision.IsRecievedData;
 }
 
