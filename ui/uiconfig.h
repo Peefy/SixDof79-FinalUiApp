@@ -73,6 +73,7 @@
 #define IDC_BUTTON_ROLL_ZERO_SUB_SHOW_TEXT	    "²àÇãÎ¢µ÷-"
 #define IDC_BUTTON_PITCH_ZERO_ADD_SHOW_TEXT     "¸©ÑöÎ¢µ÷+"
 #define IDC_BUTTON_PITCH_ZERO_SUB_SHOW_TEXT	    "¸©ÑöÎ¢µ÷-"
-
+#define IDC_BUTTON_YAW_ZERO_ADD_SHOW_TEXT       "Æ«º½Î¢µ÷+"
+#define IDC_BUTTON_YAW_ZERO_SUB_SHOW_TEXT	    "Æ«º½Î¢µ÷-"
 
 #endif

@@ -104,6 +104,8 @@ public:
 	afx_msg void OnBnClickedButtonRollZeroSub();
 	afx_msg void OnBnClickedButtonPitchZeroAdd();
 	afx_msg void OnBnClickedButtonPitchZeroSub();
+	afx_msg void OnBnClickedButtonYawZeroAdd();
+	afx_msg void OnBnClickedButtonYawZeroSub();
 };
 
 //{{AFX_INSERT_LOCATION}}
