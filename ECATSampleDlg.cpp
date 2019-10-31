@@ -1314,7 +1314,7 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 	}	
 	status = SIXDOF_STATUS_ISRISING;	
 	delta.ResetStatus();
-	auto more_time_count = 10;
+	auto more_time_count = 3;
 	for (auto i = 0;i < more_time_count; ++i)
 	{
 		delta.ResetAlarm();
