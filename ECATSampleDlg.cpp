@@ -1298,30 +1298,29 @@ void CECATSampleDlg::OnChkAbs()
 
 void CECATSampleDlg::OnBnClickedBtnRise()
 {	
-	if (status != SIXDOF_STATUS_BOTTOM)
+	//if (status != SIXDOF_STATUS_BOTTOM)
+	//{
+	//	MessageBox(_T(SIXDOF_NOT_BOTTOM_MESSAGE));
+	//	return;
+	//}
+	if (delta.DongRise() == false)
 	{
-		MessageBox(_T(SIXDOF_NOT_BOTTOM_MESSAGE));
-		return;
+		MessageBox(_T("不在底部不可上升"));
 	}
-	delta.DownUsingHomeMode();
-	Sleep(100);
-	delta.ReadAllSwitchStatus();
-	Sleep(50);
-	if (delta.IsAllAtBottom() == false)
-	{
-		MessageBox(_T(SIXDOF_NOT_BOTTOM_AND_RISE_MESSAGE));
-		return;
-	}	
-	status = SIXDOF_STATUS_ISRISING;	
-	delta.ResetStatus();
-	auto more_time_count = 3;
-	for (auto i = 0;i < more_time_count; ++i)
-	{
-		delta.ResetAlarm();
-		Sleep(50);
-	}
-	delta.Rise();
-	Sleep(50);
+// 	//delta.DownUsingHomeMode();
+// 	Sleep(100);
+// 	delta.ReadAllSwitchStatus();
+// 	Sleep(50);
+// 	if (delta.IsAllAtBottom() == false)
+// 	{
+// 		MessageBox(_T(SIXDOF_NOT_BOTTOM_AND_RISE_MESSAGE));
+// 		return;
+// 	}	
+// 	status = SIXDOF_STATUS_ISRISING;	
+// 	delta.ResetAlarm();
+// 	Sleep(50);
+// 	delta.Rise();
+// 	Sleep(50);
 }
 
 void CECATSampleDlg::OnBnClickedBtnMiddle()

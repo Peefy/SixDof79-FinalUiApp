@@ -328,6 +328,44 @@ void MotionControl::Rise()
 		RiseTargetPulse, 0, RISE_VEL, 0, 0.1, 0.1, 2, 0);
 }
 
+bool MotionControl::DongRise()
+{
+	I32 RiseTargetPulse[AXES_NUM];
+	I16 rt, i;
+	U16 Status = 0;
+	I32 ReadData = 0;
+
+	for(auto i = 0;i < AXES_NUM;++i)
+	{
+		RiseTargetPulse[i] = DIS_PER_R * RISE_RPM;
+	}
+
+	U16 bitValue = 0;
+	U16 ErrorCode = DOWN_ERROR_CODE;
+	U8 ErrorRegister = DOWN_ERROR_REGISTER;
+	for(auto i = 0; i < AXES_NUM; ++i)
+	{ 
+		U8 Data[5] = { 0 };
+		auto re = _ECAT_Slave_Get_EMCY_Data(CardNo, NodeId[i], SlotId[i], &ErrorCode,
+			&ErrorRegister, Data);
+		if (Data[1] != DOWN_ALARM_CODE)
+			return false;
+	}
+
+	for (i = 0; i < 6; i++)
+	{
+		rt = _ECAT_Slave_Motion_Ralm(this->CardNo, this->NodeId[i], 
+			this->SlotId[i]);
+	}
+
+	for (i = 0; i < 6; i++)
+	{
+		rt = _ECAT_Slave_CSP_Start_Move(this->CardNo, this->NodeId[i], 
+			this->SlotId[i], RiseTargetPulse[i]/*√¸¡ÓŒª÷√*/, 
+			0, RISE_VEL/*√¸¡ÓÀŸ∂»*/, 0, 0.2, 0.2, 0, 0);
+	}
+}
+
 void MotionControl::RiseWithSingle()
 {
 	I32 RiseTargetPulse = (I32)(DIS_PER_R * RISE_RPM);

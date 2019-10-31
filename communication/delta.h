@@ -60,6 +60,7 @@ public:
 	void Csp(I32 * pulse);
 	void MoveTo(I32 * pulse);
 	void Rise();
+	bool DongRise();
 	void RiseWithSingle();
 	void Middle();
 	void Down();
