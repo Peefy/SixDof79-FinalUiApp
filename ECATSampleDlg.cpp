@@ -1298,15 +1298,17 @@ void CECATSampleDlg::OnChkAbs()
 
 void CECATSampleDlg::OnBnClickedBtnRise()
 {	
-	//if (status != SIXDOF_STATUS_BOTTOM)
-	//{
-	//	MessageBox(_T(SIXDOF_NOT_BOTTOM_MESSAGE));
-	//	return;
-	//}
+	if (status != SIXDOF_STATUS_BOTTOM)
+	{
+		MessageBox(_T(SIXDOF_NOT_BOTTOM_MESSAGE));
+		return;
+	}
 	if (delta.DongRise() == false)
 	{
 		MessageBox(_T("不在底部不可上升"));
+		return;
 	}
+	status = SIXDOF_STATUS_ISRISING;
 // 	//delta.DownUsingHomeMode();
 // 	Sleep(100);
 // 	delta.ReadAllSwitchStatus();
@@ -1316,7 +1318,7 @@ void CECATSampleDlg::OnBnClickedBtnRise()
 // 		MessageBox(_T(SIXDOF_NOT_BOTTOM_AND_RISE_MESSAGE));
 // 		return;
 // 	}	
-// 	status = SIXDOF_STATUS_ISRISING;	
+		
 // 	delta.ResetAlarm();
 // 	Sleep(50);
 // 	delta.Rise();
