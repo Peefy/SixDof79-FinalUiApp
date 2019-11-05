@@ -621,10 +621,12 @@ bool MotionControl::PowerOnSelfTest(SixDofPlatformStatus laststatus, I32 * lastp
 		this->DownUsingHomeMode();
 		break;
 	case SIXDOF_STATUS_READY:
+		this->DownUsingHomeMode();
 		//ÏÂ½µ
 		//Down();
 		break;
 	case SIXDOF_STATUS_MIDDLE:
+		this->DownUsingHomeMode();
 		//Down();
 		break;
 	case SIXDOF_STATUS_RUN:
